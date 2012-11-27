@@ -54,8 +54,6 @@ public class Indexing {
     public static List<String> test = new ArrayList<>();
     public static Integer counterCall=0;
     public static int jumFile=0;
-    //public static boolean isCompress = false;
-    //public static String com= isCompress? "com_":"";
     
     public static String [] fileNames ={"document_mapping.txt", 
         "inverted_index_date.txt","term_mapping_date.txt",
@@ -109,37 +107,7 @@ public class Indexing {
         FileVisitor<Path> fileVisitor = new FileWalker();
         Files.walkFileTree(Paths.get(root), fileVisitor);
         
-        /*Indexing.invertedIndex.seek(26212);
-                byte[] buffer = new byte[70-NEWLINE.getBytes().length];
-                Indexing.invertedIndex.read(buffer);
-                String str = new String(buffer);
-                System.out.println(str);*/
-        
-        /*IndexController.addTerm("tono", "susis", index, treeIndex);
-        IndexController.addTerm("santi", "susiss",index, treeIndex);
-        IndexController.addTerm("ani", "susisss",index, treeIndex);
-        IndexController.addTerm("budi", "susissss",index, treeIndex);
-        IndexController.addTerm("ani", "susisssss",index, treeIndex);
-        System.out.println(treeIndex);
-        System.out.println(index);
-        
-        System.out.println(IndexController.getPosition("budi3", index));*/
-        
-        /*HashMap<String,String> a = new HashMap<String,String>();
-        a.put("satu", "aaaaa");
-        a.put("dua", "aaaaa");
-        a.put("tiga", "aaaaa");
-        HashMap<String,String> b = new HashMap<String,String>();
-        b.put("dua", "bbbbb");
-        b.put("empat", "aaaaa");
-        b.put("satu", "bbbbb");
-        
-        IndexController.insertDocIndex(1, a, index, treeIndex, invertedIndex);
-        IndexController.insertDocIndex(2, b, index, treeIndex, invertedIndex);
-        
-        IndexController.printTermMap(Indexing.index, Indexing.treeIndex, Indexing.termMapping);
-        System.out.println(index);
-        System.out.println(treeIndex);*/
+       
         
     }
 }
