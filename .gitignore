@@ -1,6 +1,5 @@
-nbproject
+nbproject/private
 dist
-*.xml
+build
 *.txt
 *.class
-build
