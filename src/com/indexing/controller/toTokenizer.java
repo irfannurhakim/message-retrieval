@@ -24,7 +24,7 @@ public class toTokenizer {
      * @param to
      * @return
      */
-    public static HashMap<String, String> getListTo(String to) {
+    public static HashMap<String, String> getListTo(String to, long[] docLength) {
         HashMap<String, String> termList = new HashMap<>();
         String[] terms = to.split("_|\\W");
         long pos=0;
@@ -41,9 +41,11 @@ public class toTokenizer {
                     freq += pos+",";
                 }
                 termList.put(key, freq);
+                //docLength[2]++;
             }
         }
         //System.out.println(termList);
+        docLength[2]=pos;
         return termList;
     }
 }

@@ -24,7 +24,9 @@ public class subject_bodyTokenizer {
      * @param data
      * @return
      */
-    public static HashMap<String, String> getListTerm(String data) {
+    public static HashMap<String, String> getListTerm(String data, long[] docLength, boolean isSubject) {
+        
+        int index = isSubject? 3:4;
         HashMap<String, String> termList = new HashMap<String, String>();
         //System.out.println("bbb");
         data = Parser.removeHTMLTag(data);
@@ -47,12 +49,14 @@ public class subject_bodyTokenizer {
                             if (slice.matches("[a-zA-Z0-9]+") && slice.length() <= 30) {
                                 pos++;
                                 putToHashMap(slice, termList, pos);
+                                //docLength[index]++;
                             }
                         }
                     } else {
 
                         if (s.length() <= 30) {
                             pos++;
+                            //docLength[index]++;
                             putToHashMap(s, termList, pos);
                         }
 
@@ -65,6 +69,7 @@ public class subject_bodyTokenizer {
 
         }
         //System.out.println(termList);
+        docLength[index]=pos;
         return termList;
     }
 

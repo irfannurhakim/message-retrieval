@@ -23,7 +23,7 @@ public class dateTokenizer {
      * @param date
      * @return hashmap yang berisi token dari date
      */
-    public static HashMap<String, String> getListDate(String date) {
+    public static HashMap<String, String> getListDate(String date, long[] docLength) {
         HashMap<String, String> termList = new HashMap<String, String>();
         //String[] terms = date.split("\\W");
          String[] terms = date.split("\\W");
@@ -42,9 +42,10 @@ public class dateTokenizer {
                     freq += pos+",";
                 }
                 termList.put(key, freq);
+                //docLength[0]++;
             }
         }
-       
+       docLength[0]=pos;
         return termList;
     }
 }

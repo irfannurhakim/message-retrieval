@@ -85,23 +85,23 @@ public class FileReader implements Callable {
                 String idEmail = rawh[0].replace("[message-id: <", "").replace(">,", "");
 
                 long docNumber = 0;
-                synchronized (Indexing.docMapping) {
-                    Indexing.docID++;
-                    //Indexing.docMapping.seek(Indexing.docMapping.length());
-                    //System.out.println(path.toString());
-                    String temp = Indexing.docID + "=" + idEmail + "\r\n";
-                    Indexing.docMapping.write(temp);
-                    docNumber = Indexing.docID;
-                    //Tokenizer.docMapping.close();
-                    //System.out.println("aaaaa");
-                }
+//                String temp;
+//               
+//                synchronized (Indexing.docMapping) {
+//                    Indexing.docID++;
+//                    docNumber = Indexing.docID;
+//                    temp= docNumber + "=" + idEmail +"|";
+//                    
+//                    //Tokenizer.docMapping.close();
+//                    //System.out.println("aaaaa");
+//                }
+                
+                long[] doclength = {0,0,0,0,0,0}; //0. date, 1.from, 2.to, 3.subject, 4.body, 5.all
 
                 String[] date = rawh[1].split("from: ", 2);
-                HashMap<String, String> dateMap = dateTokenizer.getListDate(date[0]);
+                HashMap<String, String> dateMap = dateTokenizer.getListDate(date[0], doclength);
 
-                synchronized (Indexing.treeIndexDate) {
-                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.dateConcurentMap, Indexing.treeIndexDate, dateMap, docNumber);
-                }
+                
 
 
                 if (date.length == 1) {
@@ -115,10 +115,8 @@ public class FileReader implements Callable {
                     from = date[1].split("subject: ", 2);
                 }
 
-                HashMap<String, String> fromMap = FromTokenizer.getListFrom(from[0].replaceAll(", ", " "));
-                synchronized (Indexing.treeIndexFrom) {
-                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.fromConcurentMap, Indexing.treeIndexFrom, fromMap, docNumber);
-                }
+                HashMap<String, String> fromMap = FromTokenizer.getListFrom(from[0].replaceAll(", ", " "), doclength);
+               
                 //System.out.println("from=" + from[0]);
 
                 if (from.length == 1) {
@@ -136,11 +134,9 @@ public class FileReader implements Callable {
                     to[0] = "";
                 }
 
-                HashMap<String, String> toMap = toTokenizer.getListTo(to[0]);
+                HashMap<String, String> toMap = toTokenizer.getListTo(to[0], doclength);
                 //System.out.println(toMap);
-                synchronized (Indexing.treeIndexTo) {
-                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.toConcurentMap, Indexing.treeIndexTo, toMap, docNumber);
-                }
+               
 
                 //System.out.println("to" + to[0]);
 
@@ -158,11 +154,9 @@ public class FileReader implements Callable {
                 }
 
 
-                HashMap<String, String> subjectMap = subject_bodyTokenizer.getListTerm(to[1]);
+                HashMap<String, String> subjectMap = subject_bodyTokenizer.getListTerm(to[1], doclength, true);
                 //System.out.println(path.toString()+"===="+subjectMap);
-                synchronized (Indexing.treeIndexSubject) {
-                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.subjectConcurentMap, Indexing.treeIndexSubject, subjectMap, docNumber);
-                }
+                
                 //System.out.println("subjet" + to[1]);
 
 
@@ -173,45 +167,38 @@ public class FileReader implements Callable {
                     body[1] = "";
                 }
 
-                HashMap<String, String> bodyMap = subject_bodyTokenizer.getListTerm(body[1]);
-                synchronized (Indexing.treeIndexBody) {
+                HashMap<String, String> bodyMap = subject_bodyTokenizer.getListTerm(body[1], doclength, false);
+               
+                doclength[5]=doclength[0]+doclength[1]+doclength[2]+doclength[3]+doclength[4];
+                //System.out.println(doclength[5]);
+                synchronized (Indexing.docMapping) {
+                    Indexing.docID++;
+                    docNumber = Indexing.docID;
+                    String temp= docNumber + "=" + idEmail +"|"
+                            +doclength[0]+"," 
+                            +doclength[1]+","
+                            +doclength[2]+","
+                            +doclength[3]+","
+                            +doclength[4]+","
+                            +doclength[5]+"\r\n";
+                    //System.out.println(temp);
+                    Indexing.docMapping.write(temp);
+                }
+                synchronized (Indexing.treeIndexDate) {
+                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.dateConcurentMap, Indexing.treeIndexDate, dateMap, docNumber);
+                }
+                 synchronized (Indexing.treeIndexFrom) {
+                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.fromConcurentMap, Indexing.treeIndexFrom, fromMap, docNumber);
+                }
+                  synchronized (Indexing.treeIndexTo) {
+                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.toConcurentMap, Indexing.treeIndexTo, toMap, docNumber);
+                }
+                  synchronized (Indexing.treeIndexSubject) {
+                    BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.subjectConcurentMap, Indexing.treeIndexSubject, subjectMap, docNumber);
+                }
+                   synchronized (Indexing.treeIndexBody) {
                     BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.bodyConcurentMap, Indexing.treeIndexBody, bodyMap, docNumber);
                 }
-                //System.out.println("body" + body[1]);
-
-                //HashMap<String, Integer> allFieldMap;// = AllFieldTokenizer.allFieldTermList(dateMap, toMap, fromMap, subjectMap, bodyMap);        
-                //BigConcurentHashMap.mergeBigHashMap(BigConcurentHashMap.allConcurentMap, allFieldMap);
-                //System.out.println(allFieldMap);
-
-
-                //System.out.println(path.toString());
-
-                /*
-                 * synchronized (Indexing.invertedIndexDate) {
-                 * IndexController.insertDocIndex(docNumber, dateMap,
-                 * Indexing.indexDate, Indexing.treeIndexDate,
-                 * Indexing.invertedIndexDate); } synchronized
-                 * (Indexing.invertedIndexFrom) {
-                 * IndexController.insertDocIndex(docNumber, fromMap,
-                 * Indexing.indexFrom, Indexing.treeIndexFrom,
-                 * Indexing.invertedIndexFrom); } synchronized
-                 * (Indexing.invertedIndexTo) {
-                 * IndexController.insertDocIndex(docNumber, toMap,
-                 * Indexing.indexTo, Indexing.treeIndexTo,
-                 * Indexing.invertedIndexTo); } synchronized
-                 * (Indexing.invertedIndexSubject) {
-                 * IndexController.insertDocIndex(docNumber, subjectMap,
-                 * Indexing.indexSubject, Indexing.treeIndexSubject,
-                 * Indexing.invertedIndexSubject); } synchronized
-                 * (Indexing.invertedIndexBody) {
-                 * IndexController.insertDocIndex(docNumber, bodyMap,
-                 * Indexing.indexBody, Indexing.treeIndexBody,
-                 * Indexing.invertedIndexBody); }
-                 */
-//            synchronized(Indexing.test)
-//        {
-//            Indexing.test.remove(this.path.toString());
-//        }
             }
             fileWalker.callback(new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, Integer>(), new HashMap<String, Integer>(), count);
 
