@@ -24,7 +24,7 @@ public class QueryTerm {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        System.out.println(args.length);
+
         if (args.length < 2 || !args[1].contains(":")) {
             System.out.println("Usage : QueryTerm <index_file_location> <field:query_term>");
             System.exit(0);
