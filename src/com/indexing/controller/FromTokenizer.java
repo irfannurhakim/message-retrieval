@@ -22,7 +22,7 @@ public class FromTokenizer {
      * @param from
      * @return hashmap dari field from
      */
-    public static HashMap<String, String> getListFrom(String from) {
+    public static HashMap<String, String> getListFrom(String from, long[] docLength) {
         HashMap<String, String> termList = new HashMap<String, String>();
         
         String[] terms = from.split("_|\\W");
@@ -40,9 +40,11 @@ public class FromTokenizer {
                     freq += pos+",";
                 }
                 termList.put(key, freq);
+                //docLength[1]++;
             }
         }
         //System.out.println(termList);
+        docLength[1]=pos;
         return termList;
     }
 }
