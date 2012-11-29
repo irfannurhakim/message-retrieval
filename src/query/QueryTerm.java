@@ -4,11 +4,14 @@
  */
 package query;
 
+import com.message_retrieval.DocMappingModel;
 import com.message_retrieval.QueryController;
 import com.query.controller.QueryProcessor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -49,7 +52,12 @@ public class QueryTerm {
           //  System.out.println(it.next());
         //}
         
-        QueryController.getPostingList("compliant", 5);
-
+        //QueryController.getPostingList("compliant", 5);
+        HashMap<String, DocMappingModel> test = QueryController.getDocMapping();
+        for (Map.Entry<String, DocMappingModel> entry : test.entrySet()) {
+            String string = entry.getKey();
+            DocMappingModel docMappingModel = entry.getValue();
+            System.out.println(string + "-" + docMappingModel.toString());
+        }
     }
 }

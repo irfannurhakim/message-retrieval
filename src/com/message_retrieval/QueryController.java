@@ -6,8 +6,7 @@ package com.message_retrieval;
 
 import com.query.controller.QueryProcessor;
 import indexing.Indexing;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,11 +17,35 @@ import java.util.HashSet;
  */
 public class QueryController {
 
-    public static HashMap<String, DocMappingModel> getDocMapping(double[] avgDocLength) {
+    public static HashMap<String, DocMappingModel> getDocMapping() throws IOException {
         //hashmap <docID, DocMappingModel (messID, docLength)
         //avgDocLength itu rata2 panjang document buat semua field+all.. array by reference
         //
-        return null;
+        String path = "/Users/hadipratama/NetbeansProjects/SimpleIndexing/";
+        String termMappingFileName = path + QueryProcessor.DOC_MAPPING;
+        HashMap<String, DocMappingModel> temp = new HashMap<>();
+        
+        try {
+            FileInputStream fstream = new FileInputStream(termMappingFileName);
+            try (DataInputStream in = new DataInputStream(fstream)) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                String[] a;
+                while ((strLine = br.readLine()) != null) {
+                    a = strLine.replaceAll("=", "\\|").split("\\|"); 
+                    String[] b = a[2].split(",");
+                    int[] c = new int[b.length];
+                    for (int i = 0; i < b.length; i++) {
+                        c[i] = Integer.valueOf(b[i]);
+                    }
+                    temp.put(a[0], new DocMappingModel(a[1], c));
+                }
+            }
+        } catch (Exception e) {//Catch exception if any
+            System.err.println("Error: " + e.getMessage());
+        }
+        
+        return temp;
     }
 
     public static int getQueryLength(String query) {
