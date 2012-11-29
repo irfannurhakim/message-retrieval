@@ -44,10 +44,12 @@ public class QueryTerm {
 //        QueryProcessor.doQuery(field, term, args[0]);
 //        System.out.println("Total execution time : " + ((System.nanoTime() - startTime) / 1000000000.0) + " secs");
 
-        ArrayList<String> tes = QueryController.queryNormalization("test satu \"bola dunia aaa fff test\" dan \"atos acan\"");
-        for (Iterator<String> it = tes.iterator(); it.hasNext();) {
-            System.out.println(it.next());
-        }
+        //ArrayList<String> tes = QueryController.queryNormalization("test satu \"bola dunia aaa fff test\" dan \"atos acan\"");
+        //for (Iterator<String> it = tes.iterator(); it.hasNext();) {
+          //  System.out.println(it.next());
+        //}
+        
+        QueryController.getPostingList("compliant", 5);
 
     }
 }
