@@ -33,13 +33,15 @@ public class QueryController {
         return "";
     }
     
-    public static HashMap<String, ArrayList<Integer>> getPostingList(String term)
+    public static HashMap<String, ArrayList<Integer>> getPostingList(String term, String field)
     {
         // dari 1 term ambil hashmap <docID, arrayList of position>
+        // klo fieldnya all, klo ada doc yg sama posisinya disatuin terus di sort
         return null;
     }
     
-    public static void  getPostingListBig (String term, ArrayList<HashMap<String, Integer>> allPostList, HashSet<String> allDocID)
+    public static void  getPostingListBig (String term, ArrayList<HashMap<String, Integer>> allPostList, 
+            HashSet<String> allDocID, String field)
     {
         //untuk term standar misalkan budi doank
         //nanti panggil c get posting list
@@ -48,7 +50,7 @@ public class QueryController {
     }
     
     public static void  getPostingListBigSequence (String term, ArrayList<HashMap<String, Integer>> allPostList, 
-            HashSet<String> allDocID)
+            HashSet<String> allDocID, String field)
     {
         //untuk term sequence bola|kaki
         //nanti panggil c get posting list
@@ -58,7 +60,8 @@ public class QueryController {
     }
     
     public HashMap<String, Double> calculateRank (ArrayList<HashMap<String, Integer>> allPostList, 
-            HashSet<String> allDocID, HashMap<String, DocMappingModel> docMapping, double[]avgDocLength)
+            HashSet<String> allDocID, HashMap<String, DocMappingModel> docMapping, 
+            double[]avgDocLength, String field)
     {
 
         //ngitung pke allpostList sama alldoc, pke algo BM25
