@@ -1,0 +1,68 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.message_retrieval;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+/**
+ *
+ * @author user
+ */
+public class QueryController {
+    
+    public static HashMap<String, DocMappingModel> getDocMapping (double[]avgDocLength)
+    {
+        //hashmap <docID, DocMappingModel (messID, docLength)
+        //avgDocLength itu rata2 panjang document buat semua field+all.. array by reference
+        return null;
+    }
+    public static int getQueryLength (String query)
+    {
+        //ambil panjang query, co: Budi "bermain bola" -->3
+        return 0;
+    }
+    
+    public static String queryNormalization (String query)
+    {
+        // Budi, bermain "bola Kaki" --> budi bermain bola|kaki
+        // si | buat tanda klo pke kutip
+        return "";
+    }
+    
+    public static HashMap<String, ArrayList<Integer>> getPostingList(String term)
+    {
+        // dari 1 term ambil hashmap <docID, arrayList of position>
+        return null;
+    }
+    
+    public static void  getPostingListBig (String term, ArrayList<HashMap<String, Integer>> allPostList, HashSet<String> allDocID)
+    {
+        //untuk term standar misalkan budi doank
+        //nanti panggil c get posting list
+        //terus hasilnya dimasukin ke all posting list, tp isinya docID, sama termfreq nya lngs
+        // terus semua docID yg ada dimasukin ke allDocID.. krn hashSet tar dia lngs nimpa..
+    }
+    
+    public static void  getPostingListBigSequence (String term, ArrayList<HashMap<String, Integer>> allPostList, 
+            HashSet<String> allDocID)
+    {
+        //untuk term sequence bola|kaki
+        //nanti panggil c get posting list
+        //dicek dulu docID mana yg posisinya ada yg sebelahan, klo yg ga ada buang c docID nya
+        //terus hasilnya dimasukin ke all posting list, tp isinya docID, sama termfreq nya lngs
+        // terus semua docID yg ada dimasukin ke allDocID.. krn hashSet tar dia lngs nimpa..
+    }
+    
+    public HashMap<String, Double> calculateRank (ArrayList<HashMap<String, Integer>> allPostList, 
+            HashSet<String> allDocID, HashMap<String, DocMappingModel> docMapping, double[]avgDocLength)
+    {
+
+        //ngitung pke allpostList sama alldoc, pke algo BM25
+        return null;
+    }
+    
+}
