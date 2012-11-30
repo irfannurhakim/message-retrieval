@@ -3,3 +3,4 @@ dist
 build
 *.txt
 *.class
+/PBOL_advanceHibernate/nbproject/private/
