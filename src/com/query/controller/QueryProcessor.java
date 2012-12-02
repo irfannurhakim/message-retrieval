@@ -21,10 +21,10 @@ import query.QueryTerm;
  */
 public class QueryProcessor {
 
-    private static final String PREFIX_INDEX_FILENAME = QueryTerm.com + "inverted_index_";
-    private static final String PREFIX_TERM_MAPPING_FILENAME = QueryTerm.com + "term_mapping_";
-    private static final String DOC_MAPPING = "document_mapping.txt";
-    private static HashMap<String, String> tempDocMapping = new HashMap<>();
+    public static final String PREFIX_INDEX_FILENAME = QueryTerm.com + "inverted_index_";
+    public static final String PREFIX_TERM_MAPPING_FILENAME = QueryTerm.com + "term_mapping_";
+    public static final String DOC_MAPPING = "document_mapping.txt";
+    public static HashMap<String, String> tempDocMapping = new HashMap<>();
     
     
     /**
@@ -192,7 +192,7 @@ public class QueryProcessor {
     * @param path
     * @throws IOException 
     */
-    private static void dumpDocMapping(String path) throws IOException {
+    public static void dumpDocMapping(String path) throws IOException {
         String termMappingFileName = path + DOC_MAPPING;
 
         try {

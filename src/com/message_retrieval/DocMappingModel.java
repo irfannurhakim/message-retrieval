@@ -9,14 +9,14 @@ package com.message_retrieval;
  * @author user
  */
 public class DocMappingModel {
-    
+
     String messID;
-    long docLength [];
+    int docLength[];
 
     public DocMappingModel() {
     }
 
-    public DocMappingModel(String messID, long[] docLength) {
+    public DocMappingModel(String messID, int[] docLength) {
         this.messID = messID;
         this.docLength = docLength;
     }
@@ -29,14 +29,20 @@ public class DocMappingModel {
         this.messID = messID;
     }
 
-    public long[] getDocLength() {
+    public int[] getDocLength() {
         return docLength;
     }
 
-    public void setDocLength(long[] docLength) {
+    public void setDocLength(int[] docLength) {
         this.docLength = docLength;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        String x = "";
+        for (int i : docLength) {
+            x += String.valueOf(i);
+        }
+        return "MID : " + messID + " length :" + x;
+    }
 }

@@ -4,8 +4,14 @@
  */
 package query;
 
+import com.message_retrieval.DocMappingModel;
+import com.message_retrieval.QueryController;
 import com.query.controller.QueryProcessor;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -24,22 +30,34 @@ public class QueryTerm {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        System.out.println(args.length);
-        if (args.length < 2 || !args[1].contains(":")) {
-            System.out.println("Usage : QueryTerm <index_file_location> <field:query_term>");
-            System.exit(0);
+
+//        if (args.length < 2 || !args[1].contains(":")) {
+//            System.out.println("Usage : QueryTerm <index_file_location> <field:query_term>");
+//            System.exit(0);
+//        }
+//
+//        String field = args[1].split(":")[0];
+//        String term = args[1].split(":")[1];
+//        if (args.length > 2 && args[2].equalsIgnoreCase("-com")) {
+//            com = "com_";
+//            isCompress = true;
+//        }
+//
+//        long startTime = System.nanoTime();
+//        QueryProcessor.doQuery(field, term, args[0]);
+//        System.out.println("Total execution time : " + ((System.nanoTime() - startTime) / 1000000000.0) + " secs");
+
+        //ArrayList<String> tes = QueryController.queryNormalization("test satu \"bola dunia aaa fff test\" dan \"atos acan\"");
+        //for (Iterator<String> it = tes.iterator(); it.hasNext();) {
+          //  System.out.println(it.next());
+        //}
+        
+        //QueryController.getPostingList("compliant", 5);
+        HashMap<String, DocMappingModel> test = QueryController.getDocMapping();
+        for (Map.Entry<String, DocMappingModel> entry : test.entrySet()) {
+            String string = entry.getKey();
+            DocMappingModel docMappingModel = entry.getValue();
+            System.out.println(string + "-" + docMappingModel.toString());
         }
-
-        String field = args[1].split(":")[0];
-        String term = args[1].split(":")[1];
-        if (args.length > 2 && args[2].equalsIgnoreCase("-com")) {
-            com = "com_";
-            isCompress = true;
-        }
-
-        long startTime = System.nanoTime();
-        QueryProcessor.doQuery(field, term, args[0]);
-        System.out.println("Total execution time : " + ((System.nanoTime() - startTime) / 1000000000.0) + " secs");
-
     }
 }
