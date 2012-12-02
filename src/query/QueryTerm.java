@@ -18,7 +18,6 @@ import java.util.Map;
  * @author irfannurhakim
  */
 public class QueryTerm {
-
     public static String com = "";
     public static boolean isCompress = false;
 
@@ -53,11 +52,11 @@ public class QueryTerm {
         //}
         
         //QueryController.getPostingList("compliant", 5);
-        HashMap<String, DocMappingModel> test = QueryController.getDocMapping();
-        for (Map.Entry<String, DocMappingModel> entry : test.entrySet()) {
-            String string = entry.getKey();
-            DocMappingModel docMappingModel = entry.getValue();
-            System.out.println(string + "-" + docMappingModel.toString());
-        }
+//        HashMap<String, DocMappingModel> test = QueryController.getDocMapping();
+//        for (Map.Entry<String, DocMappingModel> entry : test.entrySet()) {
+//            String string = entry.getKey();
+//            DocMappingModel docMappingModel = entry.getValue();
+//            System.out.println(string + "-" + docMappingModel.toString());
+//        }
     }
 }
