@@ -7,19 +7,8 @@ package com.message_retrieval;
 import com.query.controller.QueryProcessor;
 import indexing.Indexing;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -264,17 +253,16 @@ public class QueryController {
         } catch (IOException ex) {
             Logger.getLogger(QueryController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(postList!=null)
-        {
-        Iterator<Entry<String, ArrayList<Integer>>> itr = postList.entrySet().iterator();
-        while (itr.hasNext()) {
-            Entry<String, ArrayList<Integer>> entry = itr.next();
-            String docID = entry.getKey();
-            ArrayList<Integer> docPos = entry.getValue();
-            allDocID.add(docID);
-            postListFreq.put(docID, docPos.size());
-        }
-        allPostList.put(term, postListFreq);
+        if (postList != null) {
+            Iterator<Entry<String, ArrayList<Integer>>> itr = postList.entrySet().iterator();
+            while (itr.hasNext()) {
+                Entry<String, ArrayList<Integer>> entry = itr.next();
+                String docID = entry.getKey();
+                ArrayList<Integer> docPos = entry.getValue();
+                allDocID.add(docID);
+                postListFreq.put(docID, docPos.size());
+            }
+            allPostList.put(term, postListFreq);
         }
         //System.out.println(allDocID);
 
@@ -353,7 +341,7 @@ public class QueryController {
             Entry<String, Integer> entry = itr.next();
             String term = entry.getKey();
             //System.out.println(term);
-            if (term.indexOf("|")!=-1) {
+            if (term.indexOf("|") != -1) {
                 //System.out.println(term);
                 getPostingListBigSequence(term, allPostList, allDocID, field);
             } else {
@@ -421,24 +409,23 @@ public class QueryController {
 
         return hasil;
     }
+
     public static LinkedHashMap sortByValue(Map map) {
-     List list = new LinkedList(map.entrySet());
-     Collections.sort(list, new Comparator() {
-          public int compare(Object o1, Object o2) {
-               return ((Comparable) ((Map.Entry) (o2)).getValue())
-              .compareTo(((Map.Entry) (o1)).getValue());
-          }
-     });
+        List list = new LinkedList(map.entrySet());
+        Collections.sort(list, new Comparator() {
 
-    LinkedHashMap result = new LinkedHashMap();
-    for (Iterator it = list.iterator(); it.hasNext();) {
-        Map.Entry entry = (Map.Entry)it.next();
-        result.put(entry.getKey(), entry.getValue());
+            public int compare(Object o1, Object o2) {
+                return ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue());
+            }
+        });
+
+        LinkedHashMap result = new LinkedHashMap();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
-    return result;
-} 
-    
-
 
     public static void main(String[] args) {
 
