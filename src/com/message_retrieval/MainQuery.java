@@ -24,13 +24,13 @@ public class MainQuery {
     public static void main(String[] args) {
 
         //path = "C:\\Users\\user\\Documents\\NetBeansProjects\\message-retrieval\\";
-        path = "/Users/hadipratama/NetBeansProjects/SimpleIndexing/";
+        path = "/Users/hadipratama/Documents/Indexing/";
 
         docMapping = QueryController.getDocMapping();
         long start = System.currentTimeMillis();
-        terms = QueryController.queryNormalization("customer account \"your password\"");
+        terms = QueryController.queryNormalization("your");
         System.out.println(terms);
-        LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, 5);
+        LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, 1);
         System.out.println(weight);
         long end = System.currentTimeMillis();
         System.out.println("time:" + (end - start) * 1.00 / 1000);
