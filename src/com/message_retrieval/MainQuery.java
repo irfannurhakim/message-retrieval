@@ -31,87 +31,52 @@ public class MainQuery {
     public static long end = 0;
     public static String com = "";
     public static boolean isCompress = false;
-    
 
     public static void main(String[] args) {
 
-        isCompress = false;
-        path = "/Users/hadipratama/Documents/Indexing/";
-        if (isCompress) {
-            com = "com_";
+        String query;
+        int field = 6;
+        path = ".";
+
+        if (args.length <= 3) {
+            System.out.println("Usage: < path_to_index_file > < query_term > < -u | -c > [<field_code>]\n");
+            System.out.println("Choose index file : ");
+            System.out.println("    -u      uncompressed index\n");
+            System.out.println("    -c      compressed index\n");
+            System.out.println("Field code :\n");
+            System.out.println("    1       Data Field\n");
+            System.out.println("    2       To Field\n");
+            System.out.println("    3       From Field\n");
+            System.out.println("    4       Subject Field\n");
+            System.out.println("    5       Body Field\n");
+            System.out.println("If you want search to all fields, just omit the field_code parameter.\n");
+            System.out.println("Example search \"myquery\" on field body : MainQuery /path/to/index \"myquery\" -u 5");
+            System.exit(0);
         }
-        
-        //path = "/Users/hadipratama/Documents/Indexing/";
 
-        // System.exit(0);
-
-
-//        path = args[0];
-//        term = args[1];
-//        
-//        if(args.length == 3){
-//            field = Integer.valueOf(args[2]);
-//        }
-
-        //path = "C:\\Users\\user\\Documents\\NetBeansProjects\\message-retrieval\\";
-        //path = "/Users/hadipratama/Documents/Indexing/";
+        path = args[0];
+        query = args[1];
+        if (args[2].equalsIgnoreCase("-c")) {
+            com = "com_";
+            isCompress = true;
+        }
+        if (args.length == 4) {
+            field = Integer.valueOf(args[3]);
+        }
 
         docMapping = QueryController.getDocMapping();
         termMapping = QueryController.getTermMapping();
-        
+
         start = System.currentTimeMillis();
-        String input = "customer account \"your password\"";
-        String fileName = codeName + "-" + input + ".txt";
-        String query = "customer account \"your password\"";
+        // String query = "customer account \"your password\"";
+        String fileName = codeName + "-" + query + ".txt";
+
         query = Parser.parseQuery(query);
         terms = QueryController.queryNormalization(query);
         System.out.println("Processing query : " + terms);
-        LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, 6);
+        LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, field);
         try {
-            QueryController.printWeight(input, weight, com + fileName.replaceAll("\"", ""));
-            //System.out.println(weight);
-
-            //        System.out.println(docMapping.size());
-            //        for (int i = 0; i < avgDocLength.length; i++) {
-            //            System.out.println(avgDocLength[i]);
-            //            
-            //        }
-            //        HashMap<String, Integer> terms = QueryController.queryNormalization("saya \"adalah seorang\" anak gembala saya \"selalu riang\" serta gembira");
-            //        System.out.println(terms);
-            //        
-            //        HashMap<String, ArrayList<Integer>> test = new HashMap<>();
-            //        try {
-            //            test = QueryController.getPostingList("goes", 5);
-            //        } catch (FileNotFoundException ex) {
-            //            Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
-            //        } catch (IOException ex) {
-            //            Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
-            //        System.out.println(test);
-            //        System.out.println(test);
-
-
-
-            //                    QueryController.getPostingListBig("goes", allPostList, allDocID, 5);
-            //                    QueryController.getPostingListBig("golden", allPostList, allDocID, 5);
-            //                    QueryController.getPostingListBig("golly", allPostList, allDocID, 5);
-
-            //                    QueryController.getPostingListBigSequence("let|me|know", allPostList, allDocID, 5);
-            //                    //System.out.println(allDocID);
-            //                    System.out.println(allPostList);
-
-            //        try {
-            //            //        for (int i = 1; i < 6; i++) {
-            //            //            System.out.println(docMapping.get("2").docLength[i-1]);
-            //            //            System.out.println(QueryController.fieldLengthAcc("2", i));
-            //            //            System.out.println("================");
-            //            //        }
-            //                    
-            //                   // System.out.println(QueryController.getPostingListAll("editor"));
-            //        } catch (FileNotFoundException ex) {
-            //            Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
-            //        } catch (IOException ex) {
-            //            Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
-            //        }
+            QueryController.printWeight(query, weight, com + fileName.replaceAll("\"", ""));
         } catch (IOException ex) {
             Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
         }
