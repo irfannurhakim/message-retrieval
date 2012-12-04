@@ -43,6 +43,19 @@ public class MainQuery {
         }
         //path = "/Users/hadipratama/Documents/Indexing/";
 
+            System.exit(0);
+        }
+        
+        path = args[0];
+        term = args[1];
+        
+        if(args.length == 3){
+            field = Integer.valueOf(args[2]);
+        }
+        
+        //path = "C:\\Users\\user\\Documents\\NetBeansProjects\\message-retrieval\\";
+        //path = "/Users/hadipratama/Documents/Indexing/";
+        
         docMapping = QueryController.getDocMapping();
         termMapping = QueryController.getTermMapping();
         start = System.currentTimeMillis();

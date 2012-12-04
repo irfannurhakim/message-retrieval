@@ -180,7 +180,7 @@ public class QueryProcessor {
      * @param term
      * @throws IOException 
      */
-    private static void writeFile(String textToWrite, String field, String term) throws IOException {
+    public static void writeFile(String textToWrite, String field, String term) throws IOException {
         try (FileChannel rwChannel = new RandomAccessFile(QueryTerm.com + Indexing.codeName + "-" + field + "-" + term + ".txt", "rw").getChannel()) {
             ByteBuffer wrBuf = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, textToWrite.length());
             wrBuf.put(textToWrite.getBytes());
