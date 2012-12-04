@@ -109,8 +109,7 @@ public class QueryController {
         // dari 1 term ambil hashmap <docID, arrayList of position>
         // klo fieldnya all, klo ada doc yg sama posisinya disatuin terus di sort
         // field 1=date, 2=to, 3=from, 4=subject, 5=body, 6=all
-        
-        
+
         String field;
         HashMap<String, ArrayList<Integer>> temp = new HashMap<>();
         if (fieldCode == 6) {
@@ -137,20 +136,20 @@ public class QueryController {
                     break;
             }
 
-            
+
             String path = MainQuery.path;
             String indexFileName = path + QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
             String termMappingFileName = path + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
-            
+
             HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
             String strFromHashMap = termTemp.get(term);
             ArrayList<Object> position = new ArrayList<>();
 
-            if(strFromHashMap != null){
+            if (strFromHashMap != null) {
                 position.add(Long.parseLong(strFromHashMap.split("\\|")[1]));
                 position.add(Integer.valueOf(strFromHashMap.split("\\|")[2]));
-                position.add(strFromHashMap.split("=")[0]);   
-                
+                position.add(strFromHashMap.split("=")[0]);
+
                 RandomAccessFile indexFile = new RandomAccessFile(indexFileName, "r");
                 indexFile.seek((Long) position.get(0));
                 byte[] buffer = new byte[(int) position.get(1) - Indexing.NEWLINE.getBytes().length];
@@ -169,54 +168,8 @@ public class QueryController {
                     }
                     temp.put(docID, tempPos);
                 }
-            } 
-            /*
-            // muali mencari dengan binary search algo
-            RandomAccessFile file = new RandomAccessFile(termMappingFileName, "r");
-            ArrayList<Object> position = new ArrayList<>();
-            file.seek(0);
-            String line = file.readLine().split("=")[0];
-            if (line == null || line.compareTo(term) >= 0) {
-                return null;
             }
-
-            long beg = 0;
-            long end = file.length();
-            boolean found = false;
-            while (beg <= end) {
-
-                long mid = beg + (end - beg) / 2;
-                file.seek(mid);
-                file.readLine();
-                String sss = file.readLine();
-                if (sss != null) {
-                    line = sss.split("=")[0];
-                } else {
-                    line = "";
-                }
-                if (line == null || line.compareTo(term) >= 0) {
-                    if (line.matches(term)) {
-                        found = true;
-                    }
-                    end = mid - 1;
-                } else {
-                    beg = mid + 1;
-                }
-            }
-
-            if (found) {
-                file.seek(beg);
-                file.readLine();
-                String target = file.readLine();
-                position.add(Long.parseLong(target.split("\\|")[1]));
-                position.add(Integer.valueOf(target.split("\\|")[2]));
-                position.add(target.split("=")[0]);
-            } else {
-                return null;
-            } */
         }
-        //System.out.println(str.split("=")[0]);
-        //System.out.println(content);
         return temp;
     }
 
@@ -232,7 +185,6 @@ public class QueryController {
 
             HashMap<String, ArrayList<Integer>> pos = temp.get(i);
             if (pos != null) {
-                System.out.println(pos);
                 Iterator<Entry<String, ArrayList<Integer>>> itr = pos.entrySet().iterator();
                 while (itr.hasNext()) {
                     Entry<String, ArrayList<Integer>> entry = itr.next();
@@ -384,8 +336,8 @@ public class QueryController {
             double BM25Score = 0;
             String docID = (String) it.next();
             DocMappingModel docMod = docMapping.get(docID);
-            int docLength = (int) docMod.getDocLength()[field];
-            double avgDoc = avgDocLength[field];
+            int docLength = (int) docMod.getDocLength()[field - 1];
+            double avgDoc = avgDocLength[field - 1];
 
             Iterator<Entry<String, HashMap<String, Integer>>> itr = allPostList.entrySet().iterator();
             while (itr.hasNext()) {
@@ -448,14 +400,15 @@ public class QueryController {
     public static void main(String[] args) {
 
         double k = BM25Calculator(90, 100, 300, 25, 500000, 1);
-        System.out.println(k);
+        //System.out.println(k);
     }
-    
+
     /**
-    * Fungsi untuk menyimpan document mapping kedalam hashmap
-    * @param path
-    * @throws IOException 
-    */
+     * Fungsi untuk menyimpan document mapping kedalam hashmap
+     *
+     * @param path
+     * @throws IOException
+     */
     public static HashMap<String, String> dumpTermMapping(String path) throws IOException {
         HashMap<String, String> res = new HashMap<>();
         try {
@@ -465,14 +418,14 @@ public class QueryController {
             String strLine;
             String[] a;
             while ((strLine = br.readLine()) != null) {
-                a = strLine.split("="); 
+                a = strLine.split("=");
                 res.put(a[0], a[1]);
             }
             in.close();
         } catch (Exception e) {//Catch exception if any
             System.err.println("Error: " + e.getMessage());
         }
-        
+
         return res;
     }
 }
