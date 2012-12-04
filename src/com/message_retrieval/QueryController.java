@@ -214,8 +214,9 @@ public class QueryController {
             ArrayList<Object> position = new ArrayList<>();
 
             if (strFromHashMap != null) {
-                position.add(Long.parseLong(strFromHashMap.split("\\|")[1]));
-                position.add(Integer.valueOf(strFromHashMap.split("\\|")[2]));
+                String[] poss = strFromHashMap.split("\\|");
+                position.add(Long.parseLong(poss[1]));
+                position.add(Integer.valueOf(poss[2]));
                 position.add(strFromHashMap.split("=")[0]);
 
                 RandomAccessFile indexFile = new RandomAccessFile(indexFileName, "r");

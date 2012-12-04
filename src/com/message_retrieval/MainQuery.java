@@ -60,9 +60,9 @@ public class MainQuery {
         termMapping = QueryController.getTermMapping();
         
         start = System.currentTimeMillis();
-        String input = "account number \"your password\"";
+        String input = "customer account \"your password\"";
         String fileName = codeName + "-" + input + ".txt";
-        String query = "account number \"your password\"";
+        String query = "customer account \"your password\"";
         query = Parser.parseQuery(query);
         terms = QueryController.queryNormalization(query);
         System.out.println("Processing query : " + terms);
