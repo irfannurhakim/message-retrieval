@@ -4,9 +4,12 @@
  */
 package com.message_retrieval;
 
+import com.query.controller.QueryProcessor;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -21,7 +24,7 @@ public class MainQuery {
     public static HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
     public static HashSet<String> allDocID = new HashSet<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         
         String term = "";
         int field = 6;
@@ -58,8 +61,16 @@ public class MainQuery {
         System.out.println(terms);
         LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, field);
         long end = System.currentTimeMillis();
-        System.out.println("\ntime:" + (end - start) * 1.00 / 1000);
+        double timeElapsed = (end - start) * 1.00 / 1000;
+        String temp = "";
+        int rank = 1;
+        //write to file
+        for (Map.Entry<String, Double> entry : weight.entrySet()) {
+            temp += term + " MSG ID: " + entry.getKey() + " Rank: " + rank++ + " Weight: " + entry.getValue() + "\n";
+        }
 
+        temp += "Execution time" + timeElapsed;
+        QueryProcessor.writeFile(temp, "All", term);
         
 //        System.out.println(docMapping.size());
 //        for (int i = 0; i < avgDocLength.length; i++) {
