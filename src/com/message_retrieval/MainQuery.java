@@ -35,7 +35,7 @@ public class MainQuery {
     public static boolean isCompress = false;
     public static void main(String[] args) {
 
-        isCompress=true;
+        isCompress=false;
         path = "C:\\Users\\user\\Desktop\\Indexing_v2\\";
         if (isCompress)
         {

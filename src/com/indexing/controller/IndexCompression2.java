@@ -72,11 +72,59 @@ public class IndexCompression2 {
             abyte[0] = 1;
         }
 
+//        public static double pow(double a, double b) {
+//    final long tmp = (long) (9076650 * (a - 1) / (a + 1 + 4 * (Math.sqrt(a))) * b + 1072632447);
+//    return Double.longBitsToDouble(tmp << 32);
+//}
+        public static int pangkat2(int i) {
+            int hasil = 1;
+
+//            for (int j = 0; j < i; j++) {
+//                
+//                hasil*=2;
+//            }
+            switch (i) {
+                case 0:
+                    hasil = 1;
+                    break;
+                case 1:
+                    hasil = 2;
+                    break;
+                case 2:
+                    hasil = 4;
+                    break;
+                case 3:
+                    hasil = 8;
+                    break;
+                case 4:
+                    hasil = 16;
+                    break;
+                case 5:
+                    hasil = 32;
+                    break;
+                case 6:
+                    hasil = 64;
+                    break;
+                case 7:
+                    hasil = 128;
+                    break;
+            }
+            return hasil;
+        }
+
+        public static double pow(final double a, final double b) {
+            final long tmp = Double.doubleToLongBits(a);
+            final long tmp2 = (long) (b * (tmp - 4606921280493453312L)) + 4606921280493453312L;
+            return Double.longBitsToDouble(tmp2);
+        }
+
         public int toInt() {
             //System.out.println(" Byte ***** " + this.toString());
             int res = 0;
             for (int i = 0; i < 8; i++) {
-                res += abyte[i] * Math.pow(2, (7 - i));
+                res += abyte[i] * pangkat2((7 - i));
+                //res += abyte[i] * Math.pow(2, (7 - i));
+                //res += abyte[i] * pow(2, (7 - i));
             }
             //System.out.println(" Value ***** " + res);
             return res;
@@ -221,7 +269,7 @@ public class IndexCompression2 {
          *
          *
          * ArrayList<Integer> ab = StringToVByte(as);
-               System.out.println(ab);
+         System.out.println(ab);
          */
         //System.out.println("Input values: 5 - 824 - 1234");
 
