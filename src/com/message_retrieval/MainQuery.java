@@ -22,18 +22,45 @@ public class MainQuery {
     public static HashSet<String> allDocID = new HashSet<>();
 
     public static void main(String[] args) {
+        
+        String term = "";
+        int field = 6;
+        
+        if(args.length <= 2){
+            System.out.println("Usage: <path_to_index_file> <query_term> [<field_code>]\n");
+            System.out.println("Field code :\n");
+            System.out.println("1 Data Field\n");
+            System.out.println("2 To Field\n");
+            System.out.println("3 From Field\n");
+            System.out.println("4 Subject Field\n");
+            System.out.println("5 Body Field\n");
+            System.out.println("If you want search to all fields, just omit the field_code parameter.\n");
+            System.out.println("\n");
+            System.out.println("Example search \"myquery\" on field body : MainQuery /path/to/index \"myquery\" 5");
 
+
+            System.exit(0);
+        }
+        
+        path = args[0];
+        term = args[1];
+        
+        if(args.length == 3){
+            field = Integer.valueOf(args[2]);
+        }
+        
         //path = "C:\\Users\\user\\Documents\\NetBeansProjects\\message-retrieval\\";
-        path = "/Users/hadipratama/Documents/Indexing/";
-
+        //path = "/Users/hadipratama/Documents/Indexing/";
+        
         docMapping = QueryController.getDocMapping();
         long start = System.currentTimeMillis();
-        terms = QueryController.queryNormalization("your");
+        terms = QueryController.queryNormalization(term);
         System.out.println(terms);
-        LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, 1);
-        System.out.println(weight);
+        LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, field);
         long end = System.currentTimeMillis();
-        System.out.println("time:" + (end - start) * 1.00 / 1000);
+        System.out.println("\ntime:" + (end - start) * 1.00 / 1000);
+
+        
 //        System.out.println(docMapping.size());
 //        for (int i = 0; i < avgDocLength.length; i++) {
 //            System.out.println(avgDocLength[i]);
