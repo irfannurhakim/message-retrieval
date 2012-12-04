@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import query.QueryTerm;
 
 /**
  *
@@ -106,12 +105,13 @@ public class QueryController {
         }
         return hasil;
     }
-    
-     /**
-    * Fungsi untuk menyimpan document mapping kedalam hashmap
-    * @param path
-    * @throws IOException 
-    */
+
+    /**
+     * Fungsi untuk menyimpan document mapping kedalam hashmap
+     *
+     * @param path
+     * @throws IOException
+     */
     public static HashMap<String, String> dumpTermMapping(String path) throws IOException {
         HashMap<String, String> res = new HashMap<>();
         try {
@@ -121,24 +121,23 @@ public class QueryController {
             String strLine;
             String[] a;
             while ((strLine = br.readLine()) != null) {
-                a = strLine.split("="); 
+                a = strLine.split("=");
                 res.put(a[0], a[1]);
             }
             in.close();
         } catch (Exception e) {//Catch exception if any
             System.err.println("Error: " + e.getMessage());
         }
-        
+
         return res;
     }
-    
-    public static ArrayList<HashMap<String, String>> getTermMapping()
-    {
+
+    public static ArrayList<HashMap<String, String>> getTermMapping() {
         ArrayList<HashMap<String, String>> hasil = new ArrayList<>();
-        String field="";
+        String field = "";
         for (int i = 1; i < 6; i++) {
-            
-             switch (i) {
+
+            switch (i) {
                 case 1:
                     field = "date";
                     break;
@@ -159,10 +158,10 @@ public class QueryController {
                     break;
             }
 
-            
+
             String path = MainQuery.path;
-           // String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
-            String termMappingFileName = path +MainQuery.com+ QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
+            // String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
+            String termMappingFileName = path + MainQuery.com + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
             try {
                 HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
                 hasil.add(termTemp);
@@ -206,11 +205,11 @@ public class QueryController {
 
 
             String path = MainQuery.path;
-            String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
+            String indexFileName = path + MainQuery.com + QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
 //            String termMappingFileName = path + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
 //            
 //            HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
-            HashMap<String, String> termTemp = MainQuery.termMapping.get(fieldCode-1);
+            HashMap<String, String> termTemp = MainQuery.termMapping.get(fieldCode - 1);
             String strFromHashMap = termTemp.get(term);
             ArrayList<Object> position = new ArrayList<>();
 
@@ -227,28 +226,28 @@ public class QueryController {
                 //System.out.println(str);
                 String content = str.split("=")[1];
                 if (MainQuery.isCompress) {
-                String tests[] = content.split(";");
-                String posID[] = tests[1].split(":");
-                ArrayList<Integer> docID = IndexCompression2.StringToVByte(tests[0]);
-                StringBuilder tempss = new StringBuilder("");
-                for (int i = 0; i < docID.size(); i++) {
-                    tempss.append(docID.get(i) + ":");
-                    //tempss += docID.get(i) + ":";
-                    ArrayList<Integer> posIDs = IndexCompression2.StringToVByte(posID[i]);
-                    StringBuilder temp2 = new StringBuilder("");
-                    for (int j = 0; j < posIDs.size(); j++) {
-                        //temp2 += posIDs.get(j) + ",";
-                        temp2.append(posIDs.get(j) + ",");
-                    }
-                    String temp3 = temp2.toString();
-                    temp3 = temp3.toString().substring(0, temp3.length() - 1);
-                    //tempss += temp2 + ";";
-                    tempss.append(temp2 + ";");
+                    String tests[] = content.split(";");
+                    String posID[] = tests[1].split(":");
+                    ArrayList<Integer> docID = IndexCompression2.StringToVByte(tests[0]);
+                    StringBuilder tempss = new StringBuilder("");
+                    for (int i = 0; i < docID.size(); i++) {
+                        tempss.append(docID.get(i) + ":");
+                        //tempss += docID.get(i) + ":";
+                        ArrayList<Integer> posIDs = IndexCompression2.StringToVByte(posID[i]);
+                        StringBuilder temp2 = new StringBuilder("");
+                        for (int j = 0; j < posIDs.size(); j++) {
+                            //temp2 += posIDs.get(j) + ",";
+                            temp2.append(posIDs.get(j) + ",");
+                        }
+                        String temp3 = temp2.toString();
+                        temp3 = temp3.toString().substring(0, temp3.length() - 1);
+                        //tempss += temp2 + ";";
+                        tempss.append(temp2 + ";");
 
+                    }
+                    content = tempss.toString();
+                    //  System.out.println(content);
                 }
-                content = tempss.toString();
-                  //  System.out.println(content);
-            }
                 String[] msgs = content.split(";");
 
                 for (String docs : msgs) {
@@ -430,8 +429,8 @@ public class QueryController {
             double BM25Score = 0;
             String docID = (String) it.next();
             DocMappingModel docMod = docMapping.get(docID);
-            int docLength = (int) docMod.getDocLength()[field-1];
-            double avgDoc = avgDocLength[field-1];
+            int docLength = (int) docMod.getDocLength()[field - 1];
+            double avgDoc = avgDocLength[field - 1];
 
             Iterator<Entry<String, HashMap<String, Integer>>> itr = allPostList.entrySet().iterator();
             while (itr.hasNext()) {
@@ -490,30 +489,29 @@ public class QueryController {
         }
         return result;
     }
-    
-    public static void printWeight (String query, LinkedHashMap<String, Double> weight, String fileName) throws IOException
-    {
+
+    public static void printWeight(String query, LinkedHashMap<String, Double> weight, String fileName) throws IOException {
         BufferedWriter weightFile = new BufferedWriter(new FileWriter(fileName));
-         Iterator<Entry<String, Double>> itr = weight.entrySet().iterator();
-         int rank =0;
-         MainQuery.end = System.currentTimeMillis();
-         long time = MainQuery.end - MainQuery.start ;
+        Iterator<Entry<String, Double>> itr = weight.entrySet().iterator();
+        int rank = 0;
+        MainQuery.end = System.currentTimeMillis();
+        long time = MainQuery.end - MainQuery.start;
         //System.out.println("time:" + (end - start) * 1.00 / 1000);
-         weightFile.write(query+MainQuery.NEWLINE);
-        while (itr.hasNext() && rank<40) {
+        weightFile.write(query + MainQuery.NEWLINE);
+        while (itr.hasNext() && rank < 40) {
             try {
                 rank++;
                 Entry<String, Double> entry = itr.next();
                 String docID = entry.getKey();
                 Double bm = entry.getValue();
                 //indexMapping.seek(indexMapping.length());
-                String toWrite = docID +  " " + rank +" " +bm+MainQuery.NEWLINE;
+                String toWrite = docID + " " + rank + " " + bm + MainQuery.NEWLINE;
                 weightFile.write(toWrite);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-        weightFile.write(time +"miliseconds");
+        weightFile.write("Execution time : " + time + " miliseconds");
         weightFile.close();
     }
 
@@ -522,6 +520,4 @@ public class QueryController {
         double k = BM25Calculator(90, 100, 300, 25, 500000, 1);
         //System.out.println(k);
     }
-    
-   
 }
