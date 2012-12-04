@@ -2,7 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.indexing.controller;
+package com.message_retrieval;
+
+import com.indexing.controller.*;
 
 /**
  *
@@ -75,8 +77,16 @@ public class Parser {
         return allString.replaceAll("\\<.*?\\>", "");
     }
     
+    public static String parseQuery (String query)
+    {
+        query=removeApostrope(query);
+        query= removeHypenate(query);
+        query= removePuncuation(query);
+        return query;
+    }
+    
     public static void main(String[] args) {
         
-        System.out.println(removePuncuation("saya, adalah. seorang \"gembala\""));
+        System.out.println(parseQuery("saya, adalah. makan-makan budi's mc'd seorang \"gembala\""));
     }
 }

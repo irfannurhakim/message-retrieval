@@ -4,6 +4,7 @@
  */
 package com.message_retrieval;
 
+import com.indexing.controller.IndexCompression2;
 import com.query.controller.QueryProcessor;
 import indexing.Indexing;
 import java.io.*;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import query.QueryTerm;
 
 /**
  *
@@ -104,6 +106,72 @@ public class QueryController {
         }
         return hasil;
     }
+    
+     /**
+    * Fungsi untuk menyimpan document mapping kedalam hashmap
+    * @param path
+    * @throws IOException 
+    */
+    public static HashMap<String, String> dumpTermMapping(String path) throws IOException {
+        HashMap<String, String> res = new HashMap<>();
+        try {
+            FileInputStream fstream = new FileInputStream(path);
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String strLine;
+            String[] a;
+            while ((strLine = br.readLine()) != null) {
+                a = strLine.split("="); 
+                res.put(a[0], a[1]);
+            }
+            in.close();
+        } catch (Exception e) {//Catch exception if any
+            System.err.println("Error: " + e.getMessage());
+        }
+        
+        return res;
+    }
+    
+    public static ArrayList<HashMap<String, String>> getTermMapping()
+    {
+        ArrayList<HashMap<String, String>> hasil = new ArrayList<>();
+        String field="";
+        for (int i = 1; i < 6; i++) {
+            
+             switch (i) {
+                case 1:
+                    field = "date";
+                    break;
+                case 2:
+                    field = "to";
+                    break;
+                case 3:
+                    field = "from";
+                    break;
+                case 4:
+                    field = "subject";
+                    break;
+                case 5:
+                    field = "body";
+                    break;
+                default:
+                    field = "body";
+                    break;
+            }
+
+            
+            String path = MainQuery.path;
+           // String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
+            String termMappingFileName = path +MainQuery.com+ QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
+            try {
+                HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
+                hasil.add(termTemp);
+            } catch (IOException ex) {
+                Logger.getLogger(QueryController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return hasil;
+    }
 
     public static HashMap<String, ArrayList<Integer>> getPostingList(String term, int fieldCode) throws FileNotFoundException, IOException {
         // dari 1 term ambil hashmap <docID, arrayList of position>
@@ -139,10 +207,11 @@ public class QueryController {
 
             
             String path = MainQuery.path;
-            String indexFileName = path + QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
-            String termMappingFileName = path + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
-            
-            HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
+            String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
+//            String termMappingFileName = path + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
+//            
+//            HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
+            HashMap<String, String> termTemp = MainQuery.termMapping.get(fieldCode-1);
             String strFromHashMap = termTemp.get(term);
             ArrayList<Object> position = new ArrayList<>();
 
@@ -156,7 +225,31 @@ public class QueryController {
                 byte[] buffer = new byte[(int) position.get(1) - Indexing.NEWLINE.getBytes().length];
                 indexFile.read(buffer);
                 String str = new String(buffer);
+                //System.out.println(str);
                 String content = str.split("=")[1];
+                if (MainQuery.isCompress) {
+                String tests[] = content.split(";");
+                String posID[] = tests[1].split(":");
+                ArrayList<Integer> docID = IndexCompression2.StringToVByte(tests[0]);
+                StringBuilder tempss = new StringBuilder("");
+                for (int i = 0; i < docID.size(); i++) {
+                    tempss.append(docID.get(i) + ":");
+                    //tempss += docID.get(i) + ":";
+                    ArrayList<Integer> posIDs = IndexCompression2.StringToVByte(posID[i]);
+                    StringBuilder temp2 = new StringBuilder("");
+                    for (int j = 0; j < posIDs.size(); j++) {
+                        //temp2 += posIDs.get(j) + ",";
+                        temp2.append(posIDs.get(j) + ",");
+                    }
+                    String temp3 = temp2.toString();
+                    temp3 = temp3.toString().substring(0, temp3.length() - 1);
+                    //tempss += temp2 + ";";
+                    tempss.append(temp2 + ";");
+
+                }
+                content = tempss.toString();
+                  //  System.out.println(content);
+            }
                 String[] msgs = content.split(";");
 
                 for (String docs : msgs) {
@@ -232,7 +325,7 @@ public class QueryController {
 
             HashMap<String, ArrayList<Integer>> pos = temp.get(i);
             if (pos != null) {
-                System.out.println(pos);
+                //System.out.println(pos);
                 Iterator<Entry<String, ArrayList<Integer>>> itr = pos.entrySet().iterator();
                 while (itr.hasNext()) {
                     Entry<String, ArrayList<Integer>> entry = itr.next();
@@ -384,8 +477,8 @@ public class QueryController {
             double BM25Score = 0;
             String docID = (String) it.next();
             DocMappingModel docMod = docMapping.get(docID);
-            int docLength = (int) docMod.getDocLength()[field];
-            double avgDoc = avgDocLength[field];
+            int docLength = (int) docMod.getDocLength()[field-1];
+            double avgDoc = avgDocLength[field-1];
 
             Iterator<Entry<String, HashMap<String, Integer>>> itr = allPostList.entrySet().iterator();
             while (itr.hasNext()) {
@@ -444,6 +537,32 @@ public class QueryController {
         }
         return result;
     }
+    
+    public static void printWeight (String query, LinkedHashMap<String, Double> weight, String fileName) throws IOException
+    {
+        BufferedWriter weightFile = new BufferedWriter(new FileWriter(fileName));
+         Iterator<Entry<String, Double>> itr = weight.entrySet().iterator();
+         int rank =0;
+         MainQuery.end = System.currentTimeMillis();
+         long time = MainQuery.end - MainQuery.start ;
+        //System.out.println("time:" + (end - start) * 1.00 / 1000);
+         weightFile.write(query+MainQuery.NEWLINE);
+        while (itr.hasNext() && rank<40) {
+            try {
+                rank++;
+                Entry<String, Double> entry = itr.next();
+                String docID = entry.getKey();
+                Double bm = entry.getValue();
+                //indexMapping.seek(indexMapping.length());
+                String toWrite = docID +  " " + rank +" " +bm+MainQuery.NEWLINE;
+                weightFile.write(toWrite);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        weightFile.write(time +"miliseconds");
+        weightFile.close();
+    }
 
     public static void main(String[] args) {
 
@@ -451,28 +570,5 @@ public class QueryController {
         System.out.println(k);
     }
     
-    /**
-    * Fungsi untuk menyimpan document mapping kedalam hashmap
-    * @param path
-    * @throws IOException 
-    */
-    public static HashMap<String, String> dumpTermMapping(String path) throws IOException {
-        HashMap<String, String> res = new HashMap<>();
-        try {
-            FileInputStream fstream = new FileInputStream(path);
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-            String[] a;
-            while ((strLine = br.readLine()) != null) {
-                a = strLine.split("="); 
-                res.put(a[0], a[1]);
-            }
-            in.close();
-        } catch (Exception e) {//Catch exception if any
-            System.err.println("Error: " + e.getMessage());
-        }
-        
-        return res;
-    }
+   
 }
