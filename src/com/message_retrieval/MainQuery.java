@@ -39,7 +39,7 @@ public class MainQuery {
         path = ".";
 
         if (args.length <= 3) {
-            System.out.println("Usage: < path_to_index_file > < query_term > < -u | -c > [<field_code>]\n");
+            System.out.println("Usage: < path_to_index_file > < path_to_query_file > < -u | -c > [<field_code>]\n");
             System.out.println("Choose index file : ");
             System.out.println("    -u      uncompressed index\n");
             System.out.println("    -c      compressed index\n");
@@ -67,10 +67,10 @@ public class MainQuery {
         docMapping = QueryController.getDocMapping();
         termMapping = QueryController.getTermMapping();
 
-        start = System.currentTimeMillis();
-        // String query = "customer account \"your password\"";
+        //query = "\"meeting tomorrow\" urgent";
         String fileName = codeName + "-" + query + ".txt";
 
+        start = System.currentTimeMillis();
         query = Parser.parseQuery(query);
         terms = QueryController.queryNormalization(query);
         System.out.println("Processing query : " + terms);

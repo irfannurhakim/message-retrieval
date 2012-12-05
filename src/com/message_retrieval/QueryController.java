@@ -62,7 +62,7 @@ public class QueryController {
     public static HashMap<String, Integer> queryNormalization(String query) {
         // agus dan "Budi bermain" "bola Kaki" --> budi bermain bola|kaki
         // si | buat tanda klo pke kutip
-        HashMap<String, Integer> res = new HashMap<String, Integer>();
+        HashMap<String, Integer> res = new HashMap<>();
         String[] yy = query.split("\\s");
         for (int i = 0; i < yy.length; i++) {
             String temp = "";
@@ -83,6 +83,59 @@ public class QueryController {
             }
         }
         return res;
+    }
+
+    // "agus tong sobar":body andre "agus sujana":body "semuanya satu" setiap:subject
+    public static HashMap<String, Integer> queryDestroyer(String query) {
+        HashMap<String, Integer> res = new HashMap<>();
+        String[] yy = query.split("\\s");
+        for (int i = 0; i < yy.length; i++) {
+            String temp = yy[i];
+            if (yy[i].startsWith("\"")) {
+                for (int j = i+1; j < yy.length; j++) {
+                    temp += "|" + yy[j];
+                    i++;
+                    if(yy[j].contains("\"")){
+                        break;
+                    }
+                }
+            }
+            String[] xx = temp.split(":");
+            if(xx.length == 1){
+                res.put(temp, 6);
+            } else {
+                res.put(xx[0].replaceAll("\"", ""),fieldTransform(xx[1]));
+            }
+        }
+        return res;
+    }
+
+    public static Integer fieldTransform(String field) {
+        int code;
+
+        switch (field) {
+            case "date":
+                code = 1;
+                break;
+            case "to":
+                code = 2;
+                break;
+            case "from":
+                code = 3;
+                break;
+            case "subject":
+                code = 4;
+                break;
+            case "body":
+                code = 5;
+                break;
+            default:
+                code = 6;
+                break;
+        }
+
+        return code;
+
     }
 
     public static void putToHashMap(String key, HashMap<String, Integer> map) {
