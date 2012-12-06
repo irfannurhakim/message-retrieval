@@ -24,8 +24,8 @@ public class MainQuery {
     public static HashMap<String, Integer> terms = new HashMap<>();
     public static double[] avgDocLength = new double[6];
     public static String path = ".", pathQueryFile = ".";
-    public static HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
-    public static HashSet<String> allDocID = new HashSet<>();
+    //public static HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
+    //public static HashSet<String> allDocID = new HashSet<>();
     public static final String codeName = "irfan_elisafina_pandapotan";
     public final static String NEWLINE = "\r\n";
     public static long start = 0;
@@ -38,8 +38,8 @@ public class MainQuery {
         //String query;
         int field = 6;
 
-        if (args.length <= 3) {
-            System.out.println("Usage: < path_to_index_file > < path_to_query_file > < -u | -c > [<field_code>]\n");
+        if (args.length <= 2) {
+            System.out.println("Usage: < path_to_index_folder > < path_to_query_file > < -u | -c > \n");
             System.out.println("Choose index file : ");
             System.out.println("    -u      uncompressed index\n");
             System.out.println("    -c      compressed index\n");
@@ -77,17 +77,23 @@ public class MainQuery {
         }
 
         //query = "\"meeting tomorrow\" urgent";
+        
         for (Map.Entry<String, String> entry : queryList.entrySet()) {
+            terms.clear();
+            
+            
+            String qn = entry.getKey();
             String query = entry.getValue();
-            String fileName = codeName + "-" + query + ".txt";
+            String fileName = codeName + "-" + qn + ".txt";
 
             start = System.currentTimeMillis();
             query = Parser.parseQuery(query);
             terms = QueryController.queryNormalization(query);
+            System.out.println(terms);
             System.out.println("Processing query : " + terms);
-            LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, field);
+            LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength);
             try {
-                QueryController.printWeight(query, weight, com + fileName.replaceAll("\"", ""));
+                QueryController.printWeight(query, weight, com + fileName);
             } catch (IOException ex) {
                 Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
             }

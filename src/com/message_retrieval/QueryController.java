@@ -64,26 +64,37 @@ public class QueryController {
     }
 
     public static HashMap<String, Integer> queryNormalization(String query) {
+        // hasilnya <term, field|freq>
         HashMap<String, Integer> res = new HashMap<>();
-        String[] yy = query.split("\\s");
-        for (int i = 0; i < yy.length; i++) {
-            String temp = "";
-            if (yy[i].startsWith("\"")) {
-                for (int j = i; j < yy.length; j++) {
-                    temp += yy[j] + "|";
-                    if (!yy[j].endsWith("\"")) {
-                        i++;
-                    } else {
-                        break;
-                    }
-                }
-                //res.add(temp.replaceAll("\"", ""));
-                putToHashMap(temp.replaceAll("\"", ""), res);
-            } else {
-                //res.add(yy[i]);
-                putToHashMap(yy[i], res);
-            }
+        
+        ArrayList<String>  yy = queryDestroyer(query);
+        //System.out.println(yy);
+        for (Iterator<String> it = yy.iterator(); it.hasNext();) {
+            String string = it.next();
+            putToHashMap(string, res);
+            
         }
+         
+        
+//        String[] yy = query.split("\\s");
+//        for (int i = 0; i < yy.length; i++) {
+//            String temp = "";
+//            if (yy[i].startsWith("\"")) {
+//                for (int j = i; j < yy.length; j++) {
+//                    temp += yy[j] + "|";
+//                    if (!yy[j].endsWith("\"")) {
+//                        i++;
+//                    } else {
+//                        break;
+//                    }
+//                }
+//                //res.add(temp.replaceAll("\"", ""));
+//                putToHashMap(temp.replaceAll("\"", ""), res);
+//            } else {
+//                //res.add(yy[i]);
+//                putToHashMap(yy[i], res);
+//            }
+//        }
         return res;
     }
 
@@ -94,8 +105,8 @@ public class QueryController {
      * @param query
      * @return HashMap
      */
-    public static HashMap<String, Integer> queryDestroyer(String query) {
-        HashMap<String, Integer> res = new HashMap<>();
+    public static ArrayList<String> queryDestroyer(String query) {
+        ArrayList<String> res = new ArrayList<>();
         String[] yy = query.split("\\s");
         for (int i = 0; i < yy.length; i++) {
             String temp = yy[i];
@@ -110,9 +121,12 @@ public class QueryController {
             }
             String[] xx = temp.split(":");
             if (xx.length == 1) {
-                res.put(temp, 6);
+                //res.put(temp, 6);
+                //res.add(temp.replaceAll("\"", "")+":"+6);
+                res.add(temp.replaceAll("\"", "") +":"+6);
             } else {
-                res.put(xx[0].replaceAll("\"", ""), fieldTransform(xx[1]));
+                //res.put(xx[0].replaceAll("\"", ""), fieldTransform(xx[1]));
+                res.add(xx[0].replaceAll("\"", "")+":"+fieldTransform(xx[1]));
             }
         }
         return res;
@@ -378,8 +392,8 @@ public class QueryController {
         return hasil;
     }
 
-    public static void getPostingListBig(String term, HashMap<String, HashMap<String, Integer>> allPostList,
-            HashSet<String> allDocID, int field) {
+    public static void getPostingListBig(String termField, HashMap<String, HashMap<String, Integer>> allPostList,
+            HashSet<String> allDocID) {
         //untuk term standar misalkan budi doank
         //nanti panggil c get posting list
         //terus hasilnya dimasukin ke all posting list, tp isinya docID, sama termfreq nya lngs
@@ -388,7 +402,8 @@ public class QueryController {
         HashMap<String, Integer> postListFreq = new HashMap<>();
         HashMap<String, ArrayList<Integer>> postList = null;
         try {
-            postList = getPostingList(term, field);
+            String[] xx = termField.split(":");
+            postList = getPostingList(xx[0], Integer.parseInt(xx[1]));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(QueryController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -403,14 +418,14 @@ public class QueryController {
                 allDocID.add(docID);
                 postListFreq.put(docID, docPos.size());
             }
-            allPostList.put(term, postListFreq);
+            allPostList.put(termField, postListFreq);
         }
         //System.out.println(allDocID);
 
     }
 
-    public static void getPostingListBigSequence(String term, HashMap<String, HashMap<String, Integer>> allPostList,
-            HashSet<String> allDocID, int field) {
+    public static void getPostingListBigSequence(String termField, HashMap<String, HashMap<String, Integer>> allPostList,
+            HashSet<String> allDocID) {
         //untuk term sequence bola|kaki
         //nanti panggil c get posting list
         //dicek dulu docID mana yg posisinya ada yg sebelahan, klo yg ga ada buang c docID nya
@@ -419,6 +434,9 @@ public class QueryController {
         HashMap<String, Integer> hasil = new HashMap<>();
         HashSet<String> docIDS = new HashSet<>();
         ArrayList<HashMap<String, ArrayList<Integer>>> postList = new ArrayList<>();
+        String[] xx = termField.split(":");
+        String term =xx[0];
+        int field =Integer.parseInt(xx[1]);
         String terms[] = term.split("\\|");
         for (String string : terms) {
             try {
@@ -468,36 +486,40 @@ public class QueryController {
                 }
             }
         }
-        allPostList.put(term, hasil);
+        allPostList.put(termField, hasil);
     }
 
     public static LinkedHashMap<String, Double> getWeight(HashMap<String, Integer> query,
             HashMap<String, DocMappingModel> docMapping,
-            double[] avgDocLength, int field) {
+            double[] avgDocLength) {
         HashMap<String, Double> hasils = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
         HashSet<String> allDocID = new HashSet<>();
         Iterator<Entry<String, Integer>> itr = query.entrySet().iterator();
         while (itr.hasNext()) {
             Entry<String, Integer> entry = itr.next();
-            String term = entry.getKey();
+            String termField=entry.getKey();
+            String xx[] = termField.split(":", 2);
+            String term=xx[0];
+            int field = Integer.parseInt(xx[1]);
+            
             //System.out.println(term);
             if (term.indexOf("|") != -1) {
                 //System.out.println(term);
-                getPostingListBigSequence(term, allPostList, allDocID, field);
+                getPostingListBigSequence(termField, allPostList, allDocID);
             } else {
-                getPostingListBig(term, allPostList, allDocID, field);
+                getPostingListBig(termField, allPostList, allDocID);
             }
         }
         //System.out.println(allDocID.size());
 
-        hasils = calculateRank(query, allPostList, allDocID, docMapping, avgDocLength, field);
+        hasils = calculateRank(query, allPostList, allDocID, docMapping, avgDocLength);
         return sortByValue(hasils);
     }
 
     public static HashMap<String, Double> calculateRank(HashMap<String, Integer> query, HashMap<String, HashMap<String, Integer>> allPostList,
             HashSet<String> allDocID, HashMap<String, DocMappingModel> docMapping,
-            double[] avgDocLength, int field) {
+            double[] avgDocLength) {
         HashMap<String, Double> hasil = new HashMap<>();
 
         int totalDoc = docMapping.size();
@@ -507,15 +529,20 @@ public class QueryController {
             double BM25Score = 0;
             String docID = (String) it.next();
             DocMappingModel docMod = docMapping.get(docID);
-            int docLength = (int) docMod.getDocLength()[field - 1];
-            double avgDoc = avgDocLength[field - 1];
+            
 
             Iterator<Entry<String, HashMap<String, Integer>>> itr = allPostList.entrySet().iterator();
             while (itr.hasNext()) {
                 Entry<String, HashMap<String, Integer>> entry = itr.next();
-                String term = entry.getKey();
+                String termField = entry.getKey();
+                //System.out.println(termField);
+                String xx[] = termField.split(":");
+                String term = xx[0];
+                int field = Integer.parseInt(xx[1]);
                 HashMap<String, Integer> postList = entry.getValue();
-                int qf = query.get(term);
+                int docLength = (int) docMod.getDocLength()[field - 1];
+                double avgDoc = avgDocLength[field - 1];
+                int qf = query.get(termField);
                 int docFreq = postList.size();
                 int termFreq = 0;
                 if (postList.get(docID) != null) {
@@ -595,7 +622,9 @@ public class QueryController {
 
     public static void main(String[] args) {
 
-        double k = BM25Calculator(90, 100, 300, 25, 500000, 1);
+        //double k = BM25Calculator(90, 100, 300, 25, 500000, 1);
         //System.out.println(k);
+        System.out.println(queryDestroyer("saya:body saya:subject \"makan nasi\" tono susi:date"));
+        System.out.println(queryNormalization("raptor:subject oct:date transactions:body purchased \"Ron Baker\""));
     }
 }
