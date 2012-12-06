@@ -110,7 +110,7 @@ public class QueryController {
             }
             String[] xx = temp.split(":");
             if (xx.length == 1) {
-                res.put(temp, 6);
+                res.put(temp.replaceAll("\"", ""), 6);
             } else {
                 res.put(xx[0].replaceAll("\"", ""), fieldTransform(xx[1]));
             }
@@ -595,7 +595,10 @@ public class QueryController {
 
     public static void main(String[] args) {
 
-        double k = BM25Calculator(90, 100, 300, 25, 500000, 1);
+        //double k = BM25Calculator(90, 100, 300, 25, 500000, 1);
         //System.out.println(k);
+        
+        HashMap<String, Integer> tt = queryDestroyer("\"empty chair\" minister:body");
+        System.out.println(tt);
     }
 }
