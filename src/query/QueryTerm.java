@@ -6,7 +6,7 @@ package query;
 
 import com.message_retrieval.DocMappingModel;
 import com.message_retrieval.QueryController;
-import com.query.controller.QueryProcessor;
+import com.message_retrieval.QueryProcessor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

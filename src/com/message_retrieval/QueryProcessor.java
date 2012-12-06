@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.query.controller;
+package com.message_retrieval;
 
 import com.indexing.controller.IndexCompression2;
 import indexing.Indexing;
@@ -25,14 +25,14 @@ public class QueryProcessor {
     public static final String PREFIX_TERM_MAPPING_FILENAME = QueryTerm.com + "term_mapping_";
     public static final String DOC_MAPPING = "document_mapping.txt";
     public static HashMap<String, String> tempDocMapping = new HashMap<>();
-    
-    
+
     /**
      * Fungsi utama untuk melakukan pencarian
+     *
      * @param field
      * @param term
      * @param path
-     * @throws IOException 
+     * @throws IOException
      */
     public static void doQuery(String field, String term, final String path) throws IOException {
 
@@ -72,8 +72,8 @@ public class QueryProcessor {
             System.out.println(toWrite);
             List<Future<String>> list = new ArrayList<>();
             ExecutorService executor = Executors.newFixedThreadPool(8);
-            
-            
+
+
             for (final String string : msgs) {
                 Callable<String> worker = new Callable<String>() {
 
@@ -106,14 +106,15 @@ public class QueryProcessor {
         }
     }
 
-    
     /**
-     * Binary search untuk mencari lokasi dimana term yang dicari pada file index
+     * Binary search untuk mencari lokasi dimana term yang dicari pada file
+     * index
+     *
      * @param field
      * @param term
      * @param path
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     private static ArrayList<Object> getPositionTerm(String field, String term, String path) throws IOException {
         String termMappingFileName = path + PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
@@ -175,10 +176,11 @@ public class QueryProcessor {
 
     /**
      * Fungsi untuk menulis hasil pencarian ke File
+     *
      * @param textToWrite
      * @param field
      * @param term
-     * @throws IOException 
+     * @throws IOException
      */
     public static void writeFile(String textToWrite, String field, String term) throws IOException {
         try (FileChannel rwChannel = new RandomAccessFile(QueryTerm.com + Indexing.codeName + "-" + field + "-" + term + ".txt", "rw").getChannel()) {
@@ -187,11 +189,12 @@ public class QueryProcessor {
         }
     }
 
-   /**
-    * Fungsi untuk menyimpan document mapping kedalam hashmap
-    * @param path
-    * @throws IOException 
-    */
+    /**
+     * Fungsi untuk menyimpan document mapping kedalam hashmap
+     *
+     * @param path
+     * @throws IOException
+     */
     public static void dumpDocMapping(String path) throws IOException {
         String termMappingFileName = path + DOC_MAPPING;
 
@@ -202,7 +205,7 @@ public class QueryProcessor {
             String strLine;
             String[] a;
             while ((strLine = br.readLine()) != null) {
-                a = strLine.split("="); 
+                a = strLine.split("=");
                 tempDocMapping.put(a[0], a[1]);
             }
             in.close();

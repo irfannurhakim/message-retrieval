@@ -5,7 +5,6 @@
 package com.message_retrieval;
 
 import com.indexing.controller.IndexCompression2;
-import com.query.controller.QueryProcessor;
 import indexing.Indexing;
 import java.io.*;
 import java.util.Map.Entry;
@@ -23,6 +22,12 @@ public class QueryController {
     final static double b = 0.75;
     final static double k2 = 100;
 
+    /**
+     * Fungsi untuk mendapatkan message id dan statistik panjang dari setiap
+     * dokumen
+     *
+     * @return HashMap<String, DocMappingModel>
+     */
     public static HashMap<String, DocMappingModel> getDocMapping() {
         //hashmap <docID, DocMappingModel (messID, docLength)
         //avgDocLength itu rata2 panjang document buat semua field+all.. array by reference
@@ -54,14 +59,11 @@ public class QueryController {
         }
         for (int i = 0; i < tempLength.length; i++) {
             MainQuery.avgDocLength[i] = tempLength[i] * 1.00 / temp.size();
-
         }
         return temp;
     }
 
     public static HashMap<String, Integer> queryNormalization(String query) {
-        // agus dan "Budi bermain" "bola Kaki" --> budi bermain bola|kaki
-        // si | buat tanda klo pke kutip
         HashMap<String, Integer> res = new HashMap<>();
         String[] yy = query.split("\\s");
         for (int i = 0; i < yy.length; i++) {
@@ -85,34 +87,45 @@ public class QueryController {
         return res;
     }
 
-    // "agus tong sobar":body andre "agus sujana":body "semuanya satu" setiap:subject
+    /**
+     * Fungsi untuk memecah query menjadi sekumpulan string berdasarkan query
+     * dan field.
+     *
+     * @param query
+     * @return HashMap
+     */
     public static HashMap<String, Integer> queryDestroyer(String query) {
         HashMap<String, Integer> res = new HashMap<>();
         String[] yy = query.split("\\s");
         for (int i = 0; i < yy.length; i++) {
             String temp = yy[i];
             if (yy[i].startsWith("\"")) {
-                for (int j = i+1; j < yy.length; j++) {
+                for (int j = i + 1; j < yy.length; j++) {
                     temp += "|" + yy[j];
                     i++;
-                    if(yy[j].contains("\"")){
+                    if (yy[j].contains("\"")) {
                         break;
                     }
                 }
             }
             String[] xx = temp.split(":");
-            if(xx.length == 1){
+            if (xx.length == 1) {
                 res.put(temp, 6);
             } else {
-                res.put(xx[0].replaceAll("\"", ""),fieldTransform(xx[1]));
+                res.put(xx[0].replaceAll("\"", ""), fieldTransform(xx[1]));
             }
         }
         return res;
     }
 
+    /**
+     * Fungsi untuk mentransformasi nama field menjadi kode field
+     *
+     * @param field
+     * @return
+     */
     public static Integer fieldTransform(String field) {
         int code;
-
         switch (field) {
             case "date":
                 code = 1;
@@ -139,7 +152,6 @@ public class QueryController {
     }
 
     public static void putToHashMap(String key, HashMap<String, Integer> map) {
-
         Integer freq = (Integer) map.get(key);
         if (freq == null) {
             freq = new Integer(1);
@@ -185,11 +197,15 @@ public class QueryController {
         return res;
     }
 
+    /**
+     * Fungsi untuk menyimpan term mapping kedalam object hashmap termmaping
+     *
+     * @return
+     */
     public static ArrayList<HashMap<String, String>> getTermMapping() {
         ArrayList<HashMap<String, String>> hasil = new ArrayList<>();
-        String field = "";
+        String field;
         for (int i = 1; i < 6; i++) {
-
             switch (i) {
                 case 1:
                     field = "date";
@@ -211,7 +227,6 @@ public class QueryController {
                     break;
             }
 
-
             String path = MainQuery.path;
             // String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
             String termMappingFileName = path + MainQuery.com + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
@@ -225,6 +240,15 @@ public class QueryController {
         return hasil;
     }
 
+    /**
+     * Fungsi untuk mendapatkan semua posting list dari semua term yang diberikan (query)
+     *
+     * @param term
+     * @param fieldCode
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
     public static HashMap<String, ArrayList<Integer>> getPostingList(String term, int fieldCode) throws FileNotFoundException, IOException {
         // dari 1 term ambil hashmap <docID, arrayList of position>
         // klo fieldnya all, klo ada doc yg sama posisinya disatuin terus di sort
