@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.indexing.controller;
+package com.message_retrieval;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -251,43 +251,5 @@ public class IndexCompression2 {
 
         }
         System.out.println(temp);
-//	LinkedList<Integer> testa = new LinkedList<Integer>();
-//        
-//        int[] a = new int[]{1,5,9,18,23,124,130,444,645,9048};
-//	       for (int i : a) {
-//            testa.add(i);
-//        }
-//               System.out.println(testa);
-//               LinkedList<Integer> asd=gapEncode(testa);
-//               System.out.println(asd);
-//             // ArrayList<Integer> asdf= new ArrayList<>(asd);
-//               ArrayList<Integer> asdf = gapDecode(new ArrayList<Integer>(asd));
-//               System.out.println(asdf);
-
-        /*
-         * String as = VByteToString(test); System.out.println(as);
-         *
-         *
-         * ArrayList<Integer> ab = StringToVByte(as);
-         System.out.println(ab);
-         */
-        //System.out.println("Input values: 5 - 824 - 1234");
-
-
-//	LinkedList<Byte> code = vbEncode(test);
-//
-//	System.out.println("Variable-byte code:");
-//	for(int i = 0 ; i < code.size() ; i++){
-//	    System.out.print(Integer.toHexString(code.get(i).toInt()) + " ");
-//	}
-//	System.out.println();
-//
-//	LinkedList<Integer> decode = vbDecode(code);
-//
-//	System.out.println("After decoding:");
-//	for(int i = 0 ; i < decode.size() ; i++){
-//	    System.out.print(decode.get(i) + " ");
-//	}
-//	System.out.println();
     }
 }
