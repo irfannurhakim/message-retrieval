@@ -4,8 +4,9 @@
  */
 package com.message_retrieval;
 
-import com.indexing.controller.IndexCompression2;
-import indexing.Indexing;
+
+
+
 import java.io.*;
 import java.util.Map.Entry;
 import java.util.*;
@@ -18,23 +19,27 @@ import java.util.logging.Logger;
  */
 public class QueryController {
 
+     private static final String PREFIX_INDEX_FILENAME = MainQuery.com + "inverted_index_";
+    private static final String PREFIX_TERM_MAPPING_FILENAME = MainQuery.com + "term_mapping_";
+    private static final String DOC_MAPPING = "document_mapping.txt";
+    //konstanta-konstanta yang digunakan pada BM25
     final static double k1 = 1.2;
     final static double b = 0.75;
     final static double k2 = 100;
 
     /**
+     * @author: Irfan
      * Fungsi untuk mendapatkan message id dan statistik panjang dari setiap
-     * dokumen
+     * dokumen dan menympimpan ke dalam bentuk Hasmap yang berisi pasangan
+     * <DocID, (messID,panjang doc)>
      *
      * @return HashMap<String, DocMappingModel>
      */
     public static HashMap<String, DocMappingModel> getDocMapping() {
-        //hashmap <docID, DocMappingModel (messID, docLength)
-        //avgDocLength itu rata2 panjang document buat semua field+all.. array by reference
-        //
+       
         long[] tempLength = {0, 0, 0, 0, 0, 0};
         String path = MainQuery.path;
-        String termMappingFileName = path + QueryProcessor.DOC_MAPPING;
+        String termMappingFileName = path + DOC_MAPPING;
         HashMap<String, DocMappingModel> temp = new HashMap<>();
 
         try {
@@ -57,14 +62,25 @@ public class QueryController {
         } catch (Exception e) {//Catch exception if any
             System.err.println("Error: " + e.getMessage());
         }
+        //menyimpan rata-rata panjang dokumen untuk setiap field, diperlukan
+        //pada algoritma BM25
         for (int i = 0; i < tempLength.length; i++) {
             MainQuery.avgDocLength[i] = tempLength[i] * 1.00 / temp.size();
         }
         return temp;
     }
 
+    
+    /**
+     * author: irfan
+     * menghasilkan hashmap yang berisi <term:field,Queryfreq> dimana term merupakan 
+     * kata yang dicari, field merupakan di field mana kata tersebut dicari (dalam kode 1-6)
+     * dan queryFreq merupakan berapa banyak query tersebut muncul
+     * @param query
+     * @return
+     */
     public static HashMap<String, Integer> queryNormalization(String query) {
-        // hasilnya <term, field|freq>
+        
         HashMap<String, Integer> res = new HashMap<>();
         
         ArrayList<String>  yy = queryDestroyer(query);
@@ -75,33 +91,14 @@ public class QueryController {
             
         }
          
-        
-//        String[] yy = query.split("\\s");
-//        for (int i = 0; i < yy.length; i++) {
-//            String temp = "";
-//            if (yy[i].startsWith("\"")) {
-//                for (int j = i; j < yy.length; j++) {
-//                    temp += yy[j] + "|";
-//                    if (!yy[j].endsWith("\"")) {
-//                        i++;
-//                    } else {
-//                        break;
-//                    }
-//                }
-//                //res.add(temp.replaceAll("\"", ""));
-//                putToHashMap(temp.replaceAll("\"", ""), res);
-//            } else {
-//                //res.add(yy[i]);
-//                putToHashMap(yy[i], res);
-//            }
-//        }
         return res;
     }
 
     /**
+     * author: irfan
      * Fungsi untuk memecah query menjadi sekumpulan string berdasarkan query
-     * dan field.
-     *
+     * dan field kemudian disimpan ke dalam array list of string.
+     * contoh hasil output:[saya:5, saya:4, makan|nasi:6, tono:6, susi:1]
      * @param query
      * @return HashMap
      */
@@ -133,6 +130,7 @@ public class QueryController {
     }
 
     /**
+     * author: irfan
      * Fungsi untuk mentransformasi nama field menjadi kode field
      *
      * @param field
@@ -165,6 +163,15 @@ public class QueryController {
 
     }
 
+    /**
+     * author: irfan 
+     * method untuk memasukan sebuah key ke hashmap dengan
+     * pengecekan, jika key tersebut sudah pernah ada maka value-nya akan
+     * ditambah 1
+     *
+     * @param key
+     * @param map
+     */
     public static void putToHashMap(String key, HashMap<String, Integer> map) {
         Integer freq = (Integer) map.get(key);
         if (freq == null) {
@@ -176,6 +183,14 @@ public class QueryController {
         map.put(key, freq);
     }
 
+    /**
+     * author: elisafina
+     * Fungsi untuk mendapatkan document length untuk docID tertentu
+     * dan field tertentu.
+     * @param docID
+     * @param field
+     * @return
+     */
     public static int fieldLengthAcc(String docID, int field) {
         int hasil = 0;
         DocMappingModel doc = MainQuery.docMapping.get(docID);
@@ -186,7 +201,9 @@ public class QueryController {
     }
 
     /**
-     * Fungsi untuk menyimpan document mapping kedalam hashmap
+     * author:irfan
+     * Fungsi untuk menyimpan dictionary termMapping 
+     * kedalam hashmap di memory
      *
      * @param path
      * @throws IOException
@@ -212,7 +229,8 @@ public class QueryController {
     }
 
     /**
-     * Fungsi untuk menyimpan term mapping kedalam object hashmap termmaping
+     * author:irfan
+     * Fungsi untuk mengambil semua termMapping untuk semua field
      *
      * @return
      */
@@ -243,7 +261,7 @@ public class QueryController {
 
             String path = MainQuery.path;
             // String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
-            String termMappingFileName = path + MainQuery.com + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
+            String termMappingFileName = path + MainQuery.com + PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
             try {
                 HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
                 hasil.add(termTemp);
@@ -255,7 +273,9 @@ public class QueryController {
     }
 
     /**
-     * Fungsi untuk mendapatkan semua posting list dari semua term yang diberikan (query)
+     * author: elisafina
+     * Fungsi untuk mendapatkan posting list dari semua term yang diberikan (query)
+     * sesuai dengan field yang diminta. kembaliannya berupa hashmap<docID,array list of position>
      *
      * @param term
      * @param fieldCode
@@ -264,10 +284,7 @@ public class QueryController {
      * @throws IOException
      */
     public static HashMap<String, ArrayList<Integer>> getPostingList(String term, int fieldCode) throws FileNotFoundException, IOException {
-        // dari 1 term ambil hashmap <docID, arrayList of position>
-        // klo fieldnya all, klo ada doc yg sama posisinya disatuin terus di sort
-        // field 1=date, 2=to, 3=from, 4=subject, 5=body, 6=all
-
+       
         String field;
         HashMap<String, ArrayList<Integer>> temp = new HashMap<>();
         if (fieldCode == 6) {
@@ -296,7 +313,7 @@ public class QueryController {
 
 
             String path = MainQuery.path;
-            String indexFileName = path + MainQuery.com + QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
+            String indexFileName = path + MainQuery.com + PREFIX_INDEX_FILENAME + field + ".txt";
 //            String termMappingFileName = path + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
 //            
 //            HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
@@ -312,7 +329,7 @@ public class QueryController {
 
                 RandomAccessFile indexFile = new RandomAccessFile(indexFileName, "r");
                 indexFile.seek((Long) position.get(0));
-                byte[] buffer = new byte[(int) position.get(1) - Indexing.NEWLINE.getBytes().length];
+                byte[] buffer = new byte[(int) position.get(1) - "\r\n".getBytes().length];
                 indexFile.read(buffer);
                 String str = new String(buffer);
                 //System.out.println(str);
@@ -357,6 +374,20 @@ public class QueryController {
         return temp;
     }
 
+    /**
+     *
+     * author: elisafina
+     * method untuk mengambil posting list untuk field all..
+     * karena pada index tidak terdapat index untuk field all, maka untuk mendapatkan posting list 
+     * untuk field all, dilakukan dengan cara mengambil posting list untuk semua field (date sampai body)
+     * kemudian menggabungkan dan meng-update posisi sesuai dengan posisi relative terhadap semua isi dokumen
+     * misalkan posisi 2 pada field subject, maka posisi untuk all adalah panjang date+panjang from + panjang 
+     * to + 2.
+     * @param term
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
     public static HashMap<String, ArrayList<Integer>> getPostingListAll(String term) throws FileNotFoundException, IOException {
         HashMap<String, ArrayList<Integer>> hasil = new HashMap<>();
         ArrayList<HashMap<String, ArrayList<Integer>>> temp = new ArrayList<>();
@@ -392,13 +423,20 @@ public class QueryController {
         return hasil;
     }
 
+    /**
+     * Author : elisafina
+     * mengambil semua posting list untuk field yang sesuai untuk query term dan field yang diberikan
+     * kemudian dimasukkan ke dalam allPostingList. Kemudian untuk setiap dokumen ID yang ditemukan 
+     * akan dimasukkan ke dalam HashSet allDocID karena tipe nya hashset maka tidak akan terjadi 
+     * duplikasi docID. allPostList dan alldocID ini yang akan digunakan pada proses ranking.
+     * Yang disimpan dalam allPostList adalah HashMap<term:field, Hashmap<docID,TF>>.
+     * 
+     * @param termField
+     * @param allPostList
+     * @param allDocID
+     */
     public static void getPostingListBig(String termField, HashMap<String, HashMap<String, Integer>> allPostList,
             HashSet<String> allDocID) {
-        //untuk term standar misalkan budi doank
-        //nanti panggil c get posting list
-        //terus hasilnya dimasukin ke all posting list, tp isinya docID, sama termfreq nya lngs
-        // terus semua docID yg ada dimasukin ke allDocID.. krn hashSet tar dia lngs nimpa..
-        //System.out.println("masuk");
         HashMap<String, Integer> postListFreq = new HashMap<>();
         HashMap<String, ArrayList<Integer>> postList = null;
         try {
@@ -424,13 +462,24 @@ public class QueryController {
 
     }
 
+    /**
+     *
+     * Author : elisafina
+     * mengambil semua posting list untuk field yang sesuai untuk query term dan field yang diberikan
+     * kemudian dimasukkan ke dalam allPostingList. Kemudian untuk setiap dokumen ID yang ditemukan 
+     * akan dimasukkan ke dalam HashSet allDocID karena tipe nya hashset maka tidak akan terjadi 
+     * duplikasi docID. allPostList dan alldocID ini yang akan digunakan pada proses ranking.
+     * Yang disimpan dalam allPostList adalah HashMap<term:field, Hashmap<docID,TF>>.
+     * perbedaan dengan method sebelumnya adalah method ini digunakan khusus untuk query dengan 
+     * tanda "....", sehingga dalam perhitungan termFrekuensi harus diperhatikan dahulu apakah
+     * posisinya berurutan.
+     * @param termField
+     * @param allPostList
+     * @param allDocID
+     */
     public static void getPostingListBigSequence(String termField, HashMap<String, HashMap<String, Integer>> allPostList,
             HashSet<String> allDocID) {
-        //untuk term sequence bola|kaki
-        //nanti panggil c get posting list
-        //dicek dulu docID mana yg posisinya ada yg sebelahan, klo yg ga ada buang c docID nya
-        //terus hasilnya dimasukin ke all posting list, tp isinya docID, sama termfreq nya lngs
-        // terus semua docID yg ada dimasukin ke allDocID.. krn hashSet tar dia lngs nimpa..
+
         HashMap<String, Integer> hasil = new HashMap<>();
         HashSet<String> docIDS = new HashSet<>();
         ArrayList<HashMap<String, ArrayList<Integer>>> postList = new ArrayList<>();
@@ -489,12 +538,24 @@ public class QueryController {
         allPostList.put(termField, hasil);
     }
 
+    /**
+     * Author : elisafina
+     * merupakan method gabungan yang didalamnya memanggil method untuk mengambil posting list
+     * untuk setiap query term yang diberikan dan kemudian menghitung nilai bobot ranking setiap dokumen
+     * dan hasilnya ditampung dalam hashmap
+     * @param query
+     * @param docMapping
+     * @param avgDocLength
+     * @return
+     */
     public static LinkedHashMap<String, Double> getWeight(HashMap<String, Integer> query,
             HashMap<String, DocMappingModel> docMapping,
             double[] avgDocLength) {
         HashMap<String, Double> hasils = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
         HashSet<String> allDocID = new HashSet<>();
+        
+        //mengambil semua posting list untuk semua query term yang diberikan
         Iterator<Entry<String, Integer>> itr = query.entrySet().iterator();
         while (itr.hasNext()) {
             Entry<String, Integer> entry = itr.next();
@@ -513,10 +574,22 @@ public class QueryController {
         }
         //System.out.println(allDocID.size());
 
+        //menghitung bobot ranking setiap dokumen
         hasils = calculateRank(query, allPostList, allDocID, docMapping, avgDocLength);
         return sortByValue(hasils);
     }
 
+    /**
+     * author: pandapotan
+     * fungsi yang digunakan untuk menghitung bobot ranking dokumen hasil
+     * dari pengambilan posting list.
+     * @param query
+     * @param allPostList
+     * @param allDocID
+     * @param docMapping
+     * @param avgDocLength
+     * @return
+     */
     public static HashMap<String, Double> calculateRank(HashMap<String, Integer> query, HashMap<String, HashMap<String, Integer>> allPostList,
             HashSet<String> allDocID, HashMap<String, DocMappingModel> docMapping,
             double[] avgDocLength) {
@@ -560,6 +633,17 @@ public class QueryController {
         return hasil;
     }
 
+    /**
+     * Author: pandapotan
+     * implementasi algoritma ranking BM25
+     * @param docLength
+     * @param avgDocLength
+     * @param docFreq
+     * @param termFreq
+     * @param totalDoc
+     * @param queryFreq
+     * @return
+     */
     public static double BM25Calculator(int docLength, double avgDocLength, int docFreq,
             int termFreq, int totalDoc, int queryFreq) {
         double hasil = 0.0;
@@ -578,6 +662,13 @@ public class QueryController {
         return hasil;
     }
 
+    /**
+     * author: pandapotan
+     * method yang digunakan untuk mengurutkan hasil ranking
+     * dari yang bobotnya tertinggi sampai terendah.
+     * @param map
+     * @return
+     */
     public static LinkedHashMap sortByValue(Map map) {
         List list = new LinkedList(map.entrySet());
         Collections.sort(list, new Comparator() {
@@ -595,6 +686,14 @@ public class QueryController {
         return result;
     }
 
+    /**
+     * author: pandapotan
+     * method yang digunakan untuk menuliskan hasil ranking yang didapat ke dalam file
+     * @param query
+     * @param weight
+     * @param fileName
+     * @throws IOException
+     */
     public static void printWeight(String query, LinkedHashMap<String, Double> weight, String fileName) throws IOException {
         BufferedWriter weightFile = new BufferedWriter(new FileWriter(fileName));
         Iterator<Entry<String, Double>> itr = weight.entrySet().iterator();

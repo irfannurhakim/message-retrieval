@@ -5,7 +5,10 @@
 package com.message_retrieval;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,7 +65,6 @@ public class MainQuery {
 
         for (Map.Entry<String, String> entry : queryList.entrySet()) {
             terms.clear();
-
 
             String qn = entry.getKey();
             String query = entry.getValue();
