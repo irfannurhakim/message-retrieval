@@ -32,7 +32,7 @@ public class MainQuery {
 
     public static void main(String[] args) {
 
-        if (args.length <= 2) {
+        if (args.length != 3) {
             System.out.println("Usage: < path_to_index_folder > < path_to_query_file > < -u | -c > \n");
             System.out.println("Choose index file : \n");
             System.out.println("    -u      uncompressed index\n");
@@ -69,7 +69,6 @@ public class MainQuery {
             start = System.currentTimeMillis();
             query = Parser.parseQuery(query);
             terms = QueryController.queryNormalization(query);
-            System.out.println(terms);
             System.out.println("Processing query : " + terms);
             LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength);
             try {
