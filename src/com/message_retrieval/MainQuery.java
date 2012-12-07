@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * 
  * @author user
  */
 public class MainQuery {
@@ -23,8 +23,6 @@ public class MainQuery {
     public static HashMap<String, Integer> terms = new HashMap<>();
     public static double[] avgDocLength = new double[6];
     public static String path = ".", pathQueryFile = ".";
-    //public static HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
-    //public static HashSet<String> allDocID = new HashSet<>();
     public static final String codeName = "irfan_elisafina_pandapotan";
     public final static String NEWLINE = "\r\n";
     public static long start = 0;
@@ -34,9 +32,9 @@ public class MainQuery {
 
     public static void main(String[] args) {
 
-        if (args.length != 2) {
+        if (args.length <= 2) {
             System.out.println("Usage: < path_to_index_folder > < path_to_query_file > < -u | -c > \n");
-            System.out.println("Choose index file : ");
+            System.out.println("Choose index file : \n");
             System.out.println("    -u      uncompressed index\n");
             System.out.println("    -c      compressed index\n");
             System.exit(0);
@@ -60,8 +58,6 @@ public class MainQuery {
         } catch (IOException ex) {
             Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        //query = "\"meeting tomorrow\" urgent";
 
         for (Map.Entry<String, String> entry : queryList.entrySet()) {
             terms.clear();

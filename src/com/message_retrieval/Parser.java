@@ -4,8 +4,6 @@
  */
 package com.message_retrieval;
 
-import com.indexing.controller.*;
-
 /**
  *
  * @author irfannurhakim
