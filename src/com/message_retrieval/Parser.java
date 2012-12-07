@@ -62,7 +62,7 @@ public class Parser {
     public static String removePuncuation(String s) {
         //return (Pattern.compile("\\p{Punct}").matcher(s).replaceAll(" "));
         //return s.replaceAll("\\p{Punct}", "");
-         return s.replaceAll("[^A-Za-z0-9\"\\s]", "");
+         return s.replaceAll("[^A-Za-z0-9\":\\s]", "");
     }
     
     /**

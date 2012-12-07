@@ -20,8 +20,8 @@ public class MainQuery {
     public static HashMap<String, Integer> terms = new HashMap<>();
     public static double[] avgDocLength = new double[6];
     public static String path = ".", pathQueryFile = ".";
-    public static HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
-    public static HashSet<String> allDocID = new HashSet<>();
+    //public static HashMap<String, HashMap<String, Integer>> allPostList = new HashMap<>();
+    //public static HashSet<String> allDocID = new HashSet<>();
     public static final String codeName = "irfan_elisafina_pandapotan";
     public final static String NEWLINE = "\r\n";
     public static long start = 0;
@@ -31,22 +31,11 @@ public class MainQuery {
 
     public static void main(String[] args) {
 
-        //String query;
-        int field = 6;
-
-        if (args.length <= 3) {
-            System.out.println("Usage: < path_to_index_file > < path_to_query_file > < -u | -c > [<field_code>]\n");
+        if (args.length <= 2) {
+            System.out.println("Usage: < path_to_index_folder > < path_to_query_file > < -u | -c > \n");
             System.out.println("Choose index file : ");
             System.out.println("    -u      uncompressed index\n");
             System.out.println("    -c      compressed index\n");
-            System.out.println("Field code :\n");
-            System.out.println("    1       Data Field\n");
-            System.out.println("    2       To Field\n");
-            System.out.println("    3       From Field\n");
-            System.out.println("    4       Subject Field\n");
-            System.out.println("    5       Body Field\n");
-            System.out.println("If you want search to all fields, just omit the field_code parameter.\n");
-            System.out.println("Example search \"myquery\" on field body : MainQuery /path/to/index \"myquery\" -u 5");
             System.exit(0);
         }
 
@@ -57,10 +46,7 @@ public class MainQuery {
             com = "com_";
             isCompress = true;
         }
-        if (args.length == 4) {
-            field = Integer.valueOf(args[3]);
-        }
-
+        
         docMapping = QueryController.getDocMapping();
         termMapping = QueryController.getTermMapping();
 
@@ -73,17 +59,23 @@ public class MainQuery {
         }
 
         //query = "\"meeting tomorrow\" urgent";
+
         for (Map.Entry<String, String> entry : queryList.entrySet()) {
+            terms.clear();
+
+
+            String qn = entry.getKey();
             String query = entry.getValue();
-            String fileName = codeName + "-" + query + ".txt";
+            String fileName = codeName + "-" + qn + ".txt";
 
             start = System.currentTimeMillis();
             query = Parser.parseQuery(query);
             terms = QueryController.queryNormalization(query);
+            System.out.println(terms);
             System.out.println("Processing query : " + terms);
-            LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength, field);
+            LinkedHashMap<String, Double> weight = QueryController.getWeight(terms, docMapping, avgDocLength);
             try {
-                QueryController.printWeight(query, weight, com + fileName.replaceAll("\"", ""));
+                QueryController.printWeight(query, weight, com + fileName);
             } catch (IOException ex) {
                 Logger.getLogger(MainQuery.class.getName()).log(Level.SEVERE, null, ex);
             }
