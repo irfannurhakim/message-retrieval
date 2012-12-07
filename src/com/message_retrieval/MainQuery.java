@@ -34,7 +34,7 @@ public class MainQuery {
 
     public static void main(String[] args) {
 
-        if (args.length <= 2) {
+        if (args.length != 2) {
             System.out.println("Usage: < path_to_index_folder > < path_to_query_file > < -u | -c > \n");
             System.out.println("Choose index file : ");
             System.out.println("    -u      uncompressed index\n");
