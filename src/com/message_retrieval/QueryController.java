@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class QueryController {
 
-     private static final String PREFIX_INDEX_FILENAME = MainQuery.com + "inverted_index_";
+    private static final String PREFIX_INDEX_FILENAME = MainQuery.com + "inverted_index_";
     private static final String PREFIX_TERM_MAPPING_FILENAME = MainQuery.com + "term_mapping_";
     private static final String DOC_MAPPING = "document_mapping.txt";
     //konstanta-konstanta yang digunakan pada BM25
@@ -261,7 +261,7 @@ public class QueryController {
 
             String path = MainQuery.path;
             // String indexFileName = path +MainQuery.com+ QueryProcessor.PREFIX_INDEX_FILENAME + field + ".txt";
-            String termMappingFileName = path + MainQuery.com + PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
+            String termMappingFileName = path + PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
             try {
                 HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
                 hasil.add(termTemp);
@@ -313,7 +313,7 @@ public class QueryController {
 
 
             String path = MainQuery.path;
-            String indexFileName = path + MainQuery.com + PREFIX_INDEX_FILENAME + field + ".txt";
+            String indexFileName = path +  PREFIX_INDEX_FILENAME + field + ".txt";
 //            String termMappingFileName = path + QueryProcessor.PREFIX_TERM_MAPPING_FILENAME + field + ".txt";
 //            
 //            HashMap<String, String> termTemp = dumpTermMapping(termMappingFileName);
@@ -335,6 +335,7 @@ public class QueryController {
                 //System.out.println(str);
                 String content = str.split("=")[1];
                 if (MainQuery.isCompress) {
+                    //System.out.println("masuk sini");
                     String tests[] = content.split(";");
                     String posID[] = tests[1].split(":");
                     ArrayList<Integer> docID = IndexCompression2.StringToVByte(tests[0]);
